@@ -1,3 +1,3 @@
 <?php
-$out = shell_exect ("C:\Program Files\Git PULL 2>&1");
-var dump($out);
+exec("C:\Program Files\Git\bin\git.exe pull 2>&1");
+

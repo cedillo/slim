@@ -4,9 +4,15 @@
 	require 'Slim/Slim.php';
 	//require_once 'Excel/reader.php';
 	//prueba de git
+<<<<<<< HEAD
 
 
 	
+=======
+//PRUEBA DE HECTOR
+//otra prueba
+	//prueba dos
+>>>>>>> origin/master
 	//PRUEBA
 	
 	\Slim\Slim::registerAutoloader();
