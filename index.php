@@ -4,8 +4,8 @@
 	require 'Slim/Slim.php';
 	//require_once 'Excel/reader.php';
 	//prueba de git
-//PRUEBA DE HECTOR
-//otra prueba
+
+
 	
 	//PRUEBA
 	
@@ -175,6 +175,7 @@
 
 	
 	// Inicio nuevo Código HVS 20160511 06:30
+	//CODIGO PHP
 
 	$app->get('/catInhabiles', function()  use ($app, $db) {
 		//$cuenta = $_SESSION["idCuentaActual"];
@@ -777,7 +778,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 
 	// Inicio nuevo Código HVS 20160512 09:30
-
+		//CODIGO PHP
 		//Guarda un día inhábil
 	$app->post('/guardar/inhabiles', function()  use($app, $db) {
 		$usrActual = $_SESSION["idUsuario"];
@@ -789,38 +790,56 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		$dia = $request->post('txtDia');	
 		$tipo = $request->post('txtTipo');	
 		$nombre = strtoupper($request->post('txtNombre'));		
-
-		$fInicio = date_create('txtFechaInicial');
-		echo($fInicio);
-		//$fInicio = $fInicio->format('Y-m-d');				
-	
-		$fFin = date_create('txtFechaFinal');
-		echo($fFin);
-		//$fFin = $fFin->format('Y-m-d');				
-	
-		//$fInicio = $request->post('txtFechaInicial');
-		//$fFin = $request->post('txtFechaFinal');
 		
+		//$fInicio = $request->post('txtFechaInicial');
+		$fInicio = date_create(($request->post('txtFechaInicial')));
+		$fInicio = $fInicio->format('Y-m-d');				
+
+		//$fFin = $request->post('txtFechaFinal');
+		$fFin = date_create(($request->post('txtFechaFinal')));
+		$fFin = $fFin->format('Y-m-d');				
+
+		$estatus = $request->post('txtEstatus');
+	
 		$oper = $request->post('txtOperacion');		
 
-					
-		if($oper=='INS')
-		{						
-			$sql="INSERT INTO sia_diasinhabiles (idCuenta, tipo, nombre, finicio, ffin, usrAlta, fAlta, estatus) " . 
-			"VALUES(:cuenta, :tipo, :nombre, :fInicio, :fFin, :usrActual, now(), 'ACTIVO');";
-				echo($sql);
-			$dbQuery = $db->prepare($sql);
+		//echo nl2br("\nEl valor de Oper es: ".$oper);
+		//echo nl2br("\nValor usrActual ".$usrActual);
+		//echo nl2br("\nValor cuenta ".$cuenta);
+		//echo nl2br("\nValor dia ".$dia);
+		//echo nl2br("\nValor tipo ".$tipo);
+		//echo nl2br("\nValor nombre ".$nombre);
+		//echo nl2br("\nValor fInicio ".$fInicio);
+		//echo nl2br("\nValor fFin ".$fFin);
+		//echo nl2br("\nValor estatus ".$estatus);
 
-			$dbQuery->execute(array(':cuenta' => $cuenta, ':tipo' => $tipo, ':nombre' => $nombre, ':fInicio' => $fInicio, ':fFin' => $fFin, ':usrActual' => $usrActual ));
-		}else{
+		try
+		{
+			if($oper=='INS')
+			{						
+				$sql="INSERT INTO sia_diasinhabiles (idCuenta, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus) " . 
+				"VALUES(:cuenta, :tipo, :nombre, :fInicio, :fFin, :usrActual, getdate(), 'ACTIVO');";
+				$dbQuery = $db->prepare($sql);
 
-			$sql="UPDATE sia_diasinhabiles SET " . 
-			"idCuenta=:cuenta, tipo=:tipo, nombre=:nombre, fInicio=:fInicio, fFin=:fFin, usrModificacion=:usrActual, " . 
-			" fModificacion=now() WHERE idDia =:dia"; 
-			echo($sql);
-			$dbQuery = $db->prepare($sql);			
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':tipo' => $tipo, ':nombre' => $nombre, ':fInicio' => $fInicio, ':fFin' => $fFin, ':usrActual' => $usrActual ));
 
-			$dbQuery->execute(array(':cuenta' => $cuenta, ':dia' => $dia, ':tipo' => $tipo, ':nombre' => $nombre, ':fInicio' => $fInicio, ':fFin' => $fFin, ':usrActual' => $usrActual));
+
+			}else{
+
+				$sql="UPDATE sia_diasinhabiles SET " . 
+				"idCuenta=:cuenta, tipo=:tipo, nombre=:nombre, fInicio=:fInicio, fFin=:fFin, usrModificacion=:usrActual, " . 
+				" fModificacion=getdate(), estatus=:estatus WHERE idDia =:dia"; 
+				$dbQuery = $db->prepare($sql);			
+
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':tipo' => $tipo, ':nombre' => $nombre, ':fInicio' => $fInicio, ':fFin' => $fFin, ':usrActual' => $usrActual, ':estatus' => $estatus, ':dia' => $dia));
+
+			}
+
+			echo nl2br("\nQuery Ejecutado : ".$sql);
+
+		}catch (PDOException $e) {
+			print "¡Error!: " . $e->getMessage() . "<br/>";
+			die();
 		}
 		$app->redirect($app->urlFor('listaInhabiles'));
 	});	
