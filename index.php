@@ -366,10 +366,20 @@
 
 			//Carga los importes
 			$Reader = new SpreadsheetReader($archivo);
-			$Sheets = $Reader -> Sheets();
 			date_default_timezone_set('UTC');			
+			
+			$Sheets = $Reader -> Sheets();
+			$hojas="";
+			foreach ($Sheets as $Index => $Name)
+			{
+				$hojas = $hojas . '\nHoja  #'.$Index.': '.$Name;
+				//$Reader -> ChangeSheet($Index);
+			}
 
-			echo "Renglones: " . $Reader->sheets[0]['numRows'] . "Columnas: " . $Reader->sheets[0]['numCols'];
+			//echo "Renglones: " . $Reader->sheets[0]['numRows'] . "Columnas: " . $Reader->sheets[0]['numCols'];
+			
+			echo $hojas;
+			
 
 			/*
 			
