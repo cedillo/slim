@@ -2,8 +2,8 @@
 	session_start();
 	require 'src/conexion.php';
 	require 'Slim/Slim.php';	
-	require('excel/php-excel-reader/excel_reader2.php');
-	require('excel/SpreadsheetReader.php');
+	require('Excel/php-excel-reader/excel_reader2.php');
+	require('Excel/SpreadsheetReader.php');
 
 	\Slim\Slim::registerAutoloader();
 	$app = new \Slim\Slim();
