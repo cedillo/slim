@@ -2,8 +2,8 @@
 	session_start();
 	require 'src/conexion.php';
 	require 'Slim/Slim.php';	
-	require('php-excel-reader/excel_reader2.php');
-	require('SpreadsheetReader.php');
+	require('excel/php-excel-reader/excel_reader2.php');
+	require('excel/SpreadsheetReader.php');
 
 	\Slim\Slim::registerAutoloader();
 	$app = new \Slim\Slim();
@@ -13,9 +13,6 @@
 	$app->config(array('debug'=>true, 'templates.path'=>'./',));
 
 	try{
-		//$db = new PDO('mysql:host=localhost;dbname=contfisc_politicai;charset=utf8', 'contfisc_usrpi', 'usrpiCota13');
-
-
 		$db = new PDO("sqlsrv:Server={$hostname}; Database={$database}", $username, $password );
 	}catch (PDOException $e) {
 		print "ERROR: " . $e->getMessage() . "<br><br>HOSTNAME: " . $hostname . " BD:" . $database . " USR: " . $username . " PASS: " . $password . "<br><br>";
@@ -350,18 +347,16 @@
 	$app->get('/cargarArchivo/Egreso/:nombre/:cuenta', function($nombre, $cuenta)    use($app, $db) {
 
 		try{
-			//$cuenta = $_SESSION["idCuentaActual"];
-			//$programa = $_SESSION["idProgramaActual"];
 			$usrActual = $_SESSION["idUsuario"];
-
 			$archivo ='uploads/' . $nombre;
 
+			/*
 			$data = new Spreadsheet_Excel_Reader();
 			//$data->setOutputEncoding('CP1251');
 			$data->setOutputEncoding('UTF-8');
 			$data->read($archivo);
-
-
+			*/
+		
 
 			//Elimina cuenta pública
 			$sql="DELETE FROM sia_cuentasdetalles WHERE idCuenta= :cuenta ;";
@@ -371,19 +366,24 @@
 
 			//Carga los importes
 
+			
+
+
+			$Reader = new SpreadsheetReader($archivo);
+			$Sheets = $Reader -> Sheets();
+			date_default_timezone_set('UTC');			
+
+			echo "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
+
+			/*
+			
 			$sql="INSERT INTO sia_cuentasdetalles " .
 			"(idCuenta, sector, subsector, unidad, funcion, subfuncion, actividad, capitulo, partida, finalidad, progPres, fuenteFinanciamiento, fuenteGenerica, fuenteEspecifica, " .
 			"origenRecurso, tipoGasto, digito, proyecto, destinoGasto, original, modificado, ejercido, pagado, pendiente, usrAlta, fAlta, estatus) " .
 			"values(:cuenta,:sector, :subsector, :unidad, :funcion, :subfuncion, :actividad, :capitulo, :partida, :finalidad, :progPres, :fuenteFinanciamiento, :fuenteGenerica, :fuenteEspecifica, " .
 			":origenRecurso, :tipoGasto, :digito, :proyecto, :destinoGasto, :original, :modificado, :ejercido, :pagado, :pendiente, :usrActual, getdate(), 'ACTIVO');";
-
-
-			//$sql="INSERT INTO sia_cuentasdetalles (idCuenta, sector, fAlta) values(:cuenta,:sector, now());";
-
-			echo "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
-
-			/*
-			//Carga los importes
+			
+			//insertar 
 			$sql="INSERT INTO sia_cuentasdetalles " .
 			"(idCuenta, sector, subsector, unidad, funcion, subfuncion, actividad, capitulo, partida, finalidad, progPres, fuenteFinanciamiento, fuenteGenerica, fuenteEspecifica, " .
 			"origenRecurso, tipoGasto, digito, proyecto, destinoGasto, original, modificado, ejercido, pagado, pendiente, usrAlta, fAlta, estatus) " .
