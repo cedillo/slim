@@ -1,7 +1,7 @@
 <?php
 	session_start();
 	require 'src/conexion.php';
-	require 'Slim/Slim.php';	
+	require 'Slim/Slim.php';
 	require('Excel/php-excel-reader/excel_reader2.php');
 	require('Excel/SpreadsheetReader.php');
 
@@ -360,10 +360,10 @@
 			//$data->setOutputEncoding('CP1251');
 			//$data->setOutputEncoding('UTF-8');
 			//$data->read($archivo);
-			
+
 			$Reader = new SpreadsheetReader($archivo);
 
-			//insertar 
+			//insertar
 			$sql="INSERT INTO sia_cuentasdetalles " .
 			"(idCuenta, sector, subsector, unidad, funcion, subfuncion, actividad, capitulo, partida, finalidad, progPres, fuenteFinanciamiento, fuenteGenerica, fuenteEspecifica, " .
 			"origenRecurso, tipoGasto, digito, proyecto, destinoGasto, original, modificado, ejercido, pagado, pendiente, usrAlta, fAlta, estatus) " .
@@ -377,9 +377,9 @@
 			error_reporting(E_ALL ^ E_NOTICE);
 
 			//for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
-			
+
 			foreach ($Reader as $Row){
-				
+
 				$sector = $row[1];
 				$subsector =  "" . $row[2];
 				$unidad =  "" . $row[3];
@@ -402,16 +402,16 @@
 				$modificado =  "" . $row[20];
 				$ejercido =  "" . $row[21];
 				$pagado =  "" . $row[22];
-				//$pendiente =  "" . $row[23];				
-			
+				//$pendiente =  "" . $row[23];
+
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
 				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
 				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
 				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
 				$nRegistros++;
-				
+
 				if ($nRegistros==10  ||  $nRegistros==1000 ) echo "\nOK Interno  Registros: " . $nRegistros . " Modif: " . $modificado;
-				
+
 			}
 			echo "OK #2 Proceso Terminado.       Registros: " . $nRegistros;
 
@@ -831,15 +831,15 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 		$oper = $request->post('txtOperacion');
 
-		//echo nl2br("\nEl valor de Oper es: ".$oper);
-		//echo nl2br("\nValor usrActual ".$usrActual);
-		//echo nl2br("\nValor cuenta ".$cuenta);
-		//echo nl2br("\nValor dia ".$dia);
-		//echo nl2br("\nValor tipo ".$tipo);
-		//echo nl2br("\nValor nombre ".$nombre);
-		//echo nl2br("\nValor fInicio ".$fInicio);
-		//echo nl2br("\nValor fFin ".$fFin);
-		//echo nl2br("\nValor estatus ".$estatus);
+		echo nl2br("\nEl valor de Oper es: ".$oper);
+		echo nl2br("\nValor usrActual ".$usrActual);
+		echo nl2br("\nValor cuenta ".$cuenta);
+		echo nl2br("\nValor dia ".$dia);
+		echo nl2br("\nValor tipo ".$tipo);
+		echo nl2br("\nValor nombre ".$nombre);
+		echo nl2br("\nValor fInicio ".$fInicio);
+		echo nl2br("\nValor fFin ".$fFin);
+		echo nl2br("\nValor estatus ".$estatus);
 
 		try
 		{
@@ -870,7 +870,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 			print "¡Error!: " . $e->getMessage() . "<br/>";
 			die();
 		}
-		$app->redirect($app->urlFor('listaInhabiles'));
+		//$app->redirect($app->urlFor('listaInhabiles'));
 	});
 
 	// Fin Nuevo Código HVS 20160512 09:30
