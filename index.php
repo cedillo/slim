@@ -373,6 +373,8 @@
 			$dbQuery = $db->prepare($sql);
 			$result="OK";
 			$nRegistros=0;
+			
+			$valores ="CADENA INTERNA: ";
 
 			error_reporting(E_ALL ^ E_NOTICE);
 
@@ -402,18 +404,25 @@
 				$modificado =  "" . $row[20];
 				$ejercido =  "" . $row[21];
 				$pagado =  "" . $row[22];
-				//$pendiente =  "" . $row[23];				
+				$pendiente =  "" . $row[23];				
+				
+				
 			
-				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
-				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
-				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
-				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
+				//$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
+				//':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
+				//':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
+				//':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
+				
+				
 				$nRegistros++;
 				
-				if ($nRegistros==10  ||  $nRegistros==1000 ) echo "\nOK Interno  Registros: " . $nRegistros . " Modif: " . $modificado;
+				$valores = $valores . "\n Registro #" . $nRegistros . " Original:"  . $original . " Modificado:"  . $modificado;
+				
+				if ($nRegistros==10  ||  $nRegistros==1000 ) break;
+				echo "\nOK Interno  Registros: " . $nRegistros . " Modif: " . $modificado;
 				
 			}
-			echo "OK #2 Proceso Terminado.       Registros: " . $nRegistros;
+			echo $valores;
 
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
