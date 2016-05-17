@@ -830,17 +830,17 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		$estatus = $request->post('txtEstatus');
 
 		$oper = $request->post('txtOperacion');
-		/*
-		echo nl2br("\nEl valor de Oper es: ".$oper);
-		echo nl2br("\nValor usrActual ".$usrActual);
-		echo nl2br("\nValor cuenta ".$cuenta);
-		echo nl2br("\nValor dia ".$dia);
-		echo nl2br("\nValor tipo ".$tipo);
-		echo nl2br("\nValor nombre ".$nombre);
-		echo nl2br("\nValor fInicio ".$fInicio);
-		echo nl2br("\nValor fFin ".$fFin);
-		echo nl2br("\nValor estatus ".$estatus);
-		*/
+		
+		//echo nl2br("\nEl valor de Oper es: ".$oper);
+		//echo nl2br("\nValor usrActual ".$usrActual);
+		//echo nl2br("\nValor cuenta ".$cuenta);
+		//echo nl2br("\nValor dia ".$dia);
+		//echo nl2br("\nValor tipo ".$tipo);
+		//echo nl2br("\nValor nombre ".$nombre);
+		//echo nl2br("\nValor fInicio ".$fInicio);
+		//echo nl2br("\nValor fFin ".$fFin);
+		//echo nl2br("\nValor estatus ".$estatus);
+		
 		try
 		{
 			if($oper=='INS')
