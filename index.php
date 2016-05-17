@@ -378,7 +378,7 @@
 
 			//for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 			
-			foreach ($Reader as $Row)
+			foreach ($Reader as $Row){
 				
 				$sector = $row[1];
 				$subsector =  "" . $row[2];
