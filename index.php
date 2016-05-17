@@ -2,15 +2,7 @@
 	session_start();	
 	require 'src/conexion.php';
 	require 'Slim/Slim.php';
-	//require_once 'Excel/reader.php';
-	//prueba de git
-
-
-//PRUEBA DE HECTOR
-//otra prueba
-	//prueba dos
-//>>>>>>> origin/master
-	//PRUEBA
+	require_once 'Excel/reader.php';
 	
 	\Slim\Slim::registerAutoloader();
 	$app = new \Slim\Slim();
