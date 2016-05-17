@@ -351,9 +351,7 @@
 	});	
 	
 	
-	$app->get('/cargarArchivo/:nombre/:cuenta', function($nombre, $cuenta)    use($app, $db) {		
-		
-		
+	$app->get('/cargarArchivo/:nombre/Egreso/:cuenta', function($nombre, $cuenta)    use($app, $db) {			
 		try{
 			//$cuenta = $_SESSION["idCuentaActual"];
 			//$programa = $_SESSION["idProgramaActual"];
