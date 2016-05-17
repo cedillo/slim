@@ -6,9 +6,6 @@
 	//prueba de git
 
 
-
-	
-=======
 //PRUEBA DE HECTOR
 //otra prueba
 	//prueba dos
