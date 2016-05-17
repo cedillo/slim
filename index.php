@@ -362,8 +362,6 @@
 			//$data->read($archivo);
 			
 			$Reader = new SpreadsheetReader($archivo);
-			
-
 
 			//insertar 
 			$sql="INSERT INTO sia_cuentasdetalles " .
@@ -381,31 +379,6 @@
 			//for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
 			
 			foreach ($Reader as $Row)
-				/*
-				$sector = $data->sheets[0]['cells'][$i][1];
-				$subsector =  "" . $data->sheets[0]['cells'][$i][2];
-				$unidad =  "" . $data->sheets[0]['cells'][$i][3];
-				$funcion =  "" . $data->sheets[0]['cells'][$i][4];
-				$subfuncion =  "" . $data->sheets[0]['cells'][$i][5];
-				$actividad =  "" . $data->sheets[0]['cells'][$i][6];
-				$capitulo =  "" . $data->sheets[0]['cells'][$i][7];
-				$partida =  "" . $data->sheets[0]['cells'][$i][8];
-				$finalidad =  "" . $data->sheets[0]['cells'][$i][9];
-				$progPres =  "" . $data->sheets[0]['cells'][$i][10];
-				$fuenteFinanciamiento =  "" . $data->sheets[0]['cells'][$i][11];
-				$fuenteGenerica =  "" . $data->sheets[0]['cells'][$i][12];
-				$fuenteEspecifica =  "" . $data->sheets[0]['cells'][$i][13];
-				$origenRecurso =  "" . $data->sheets[0]['cells'][$i][14];
-				$tipoGasto =  "" . $data->sheets[0]['cells'][$i][15];
-				$digito =  "" . $data->sheets[0]['cells'][$i][16];
-				$proyecto =  "" . $data->sheets[0]['cells'][$i][17];
-				$destinoGasto =  "" . $data->sheets[0]['cells'][$i][18];
-				$original =  "" . $data->sheets[0]['cells'][$i][19];
-				$modificado =  "" . $data->sheets[0]['cells'][$i][20];
-				$ejercido =  "" . $data->sheets[0]['cells'][$i][21];
-				$pagado =  "" . $data->sheets[0]['cells'][$i][22];
-				$pendiente =  "" . $data->sheets[0]['cells'][$i][23];
-				*/
 				
 				$sector = $row[1];
 				$subsector =  "" . $row[2];
@@ -430,26 +403,19 @@
 				$ejercido =  "" . $row[21];
 				$pagado =  "" . $row[22];
 				//$pendiente =  "" . $row[23];				
-				
-				
-
+			
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
 				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
 				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
 				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
 				$nRegistros++;
 			}
-
-			//echo "Registros: " . $nRegistros . "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
-			echo "OK#2";
+			echo "OK#2  Registros: " + $nRegistros;
 
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
 				//die();
 			}
-
-
-
 
 	});
 
