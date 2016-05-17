@@ -2,21 +2,12 @@
 	session_start();
 	require 'src/conexion.php';
 	require 'Slim/Slim.php';
-<<<<<<< HEAD
-	require_once 'Excel/reader.php';
-	
-=======
+
 	//require_once 'Excel/reader.php';
-	//prueba de git
+	
 
+	//require_once 'Excel/reader.php';
 
-//PRUEBA DE HECTOR
-//otra prueba
-	//prueba dos
-//>>>>>>> origin/master
-	//PRUEBA
-
->>>>>>> origin/master
 	\Slim\Slim::registerAutoloader();
 	$app = new \Slim\Slim();
 
@@ -385,7 +376,7 @@
 			$sql="DELETE FROM sia_cuentasdetalles WHERE idCuenta= :cuenta ;";
 			$dbQuery = $db->prepare($sql);
 			$dbQuery->execute(array(':cuenta' => $cuenta));
-<<<<<<< HEAD
+
 
 			//Carga los importes
 
@@ -397,7 +388,7 @@
 
 
 			//$sql="INSERT INTO sia_cuentasdetalles (idCuenta, sector, fAlta) values(:cuenta,:sector, now());";
-=======
+
 			echo "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
 
 			/*
@@ -407,7 +398,7 @@
 			"origenRecurso, tipoGasto, digito, proyecto, destinoGasto, original, modificado, ejercido, pagado, pendiente, usrAlta, fAlta, estatus) " .
 			"values(:cuenta,:sector, :subsector, :unidad, :funcion, :subfuncion, :actividad, :capitulo, :partida, :finalidad, :progPres, :fuenteFinanciamiento, :fuenteGenerica, :fuenteEspecifica, " .
 			":origenRecurso, :tipoGasto, :digito, :proyecto, :destinoGasto, :original, :modificado, :ejercido, :pagado, :pendiente, :usrActual, getdate(), 'ACTIVO');";
->>>>>>> origin/master
+
 			$dbQuery = $db->prepare($sql);
 			$result="OK";
 			$nRegistros=0;
@@ -441,7 +432,6 @@
 				$ejercido =  "" . $data->sheets[0]['cells'][$i][21];
 				$pagado =  "" . $data->sheets[0]['cells'][$i][22];
 				$pendiente =  "" . $data->sheets[0]['cells'][$i][23];
-<<<<<<< HEAD
 
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
 				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
@@ -452,7 +442,6 @@
 
 			echo "Registros: " . $nRegistros . "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
 
-=======
 
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
 				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
@@ -463,7 +452,6 @@
 			echo "Registros: " . $nRegistros . "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
 			*/
 
->>>>>>> origin/master
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
 				//die();
