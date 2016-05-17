@@ -850,7 +850,6 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 				$dbQuery = $db->prepare($sql);
 
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':tipo' => $tipo, ':nombre' => $nombre, ':fInicio' => $fInicio, ':fFin' => $fFin, ':usrActual' => $usrActual ));
-				//echo "<br>INS OK<hr>";
 
 			}else{
 
@@ -860,7 +859,6 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 				$dbQuery = $db->prepare($sql);
 
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':tipo' => $tipo, ':nombre' => $nombre, ':fInicio' => $fInicio, ':fFin' => $fFin, ':usrActual' => $usrActual, ':estatus' => $estatus, ':dia' => $dia));
-				//echo "<br>UPD OK";
 
 			}
 
