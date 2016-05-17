@@ -362,14 +362,7 @@
 			//$data->read($archivo);
 			
 			$Reader = new SpreadsheetReader($archivo);
-			$Sheets = $Reader -> Sheets();
-			$hojas="";
-			foreach ($Sheets as $Index => $Name)
-			{
-				echo $hojas = $hojas . '  Sheet #'.$Index.': '.$Name;
-
-			}			
-			echo"Hojas: ";
+			
 			
 			
 			
@@ -425,7 +418,7 @@
 			
 
 			//echo "Registros: " . $nRegistros . "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
-
+			echo "OK#2";
 
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
