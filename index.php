@@ -410,7 +410,7 @@
 				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
 				$nRegistros++;
 				
-				if ($nRegistros==10  ||  $nRegistros==1000 ) echo "OK Interno  Registros: " . $nRegistros;
+				if ($nRegistros==10  ||  $nRegistros==1000 ) echo "\nOK Interno  Registros: " . $nRegistros . " Modif: " . $modificado;
 				
 			}
 			echo "OK #2 Proceso Terminado.       Registros: " . $nRegistros;
