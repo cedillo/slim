@@ -7,6 +7,9 @@
 	
 
 	//require_once 'Excel/reader.php';
+	
+	require('php-excel-reader/excel_reader2.php');
+	require('SpreadsheetReader.php');
 
 	\Slim\Slim::registerAutoloader();
 	$app = new \Slim\Slim();
@@ -348,12 +351,6 @@
 
 	});
 
-
-	$app->get('/cargarArchivo/:nombre/:cuenta', function($nombre, $cuenta)    use($app, $db) {
-
-
-
-	});
 
 
 	$app->get('/cargarArchivo/Egreso/:nombre/:cuenta', function($nombre, $cuenta)    use($app, $db) {
