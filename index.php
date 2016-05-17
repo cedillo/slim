@@ -372,19 +372,16 @@
 			$sql="DELETE FROM sia_cuentasdetalles WHERE idCuenta= :cuenta ;";				
 			$dbQuery = $db->prepare($sql);
 			$dbQuery->execute(array(':cuenta' => $cuenta));
+			echo "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];	
 			
-			//Carga los importes
-			
+			/*
+			//Carga los importes			
 			$sql="INSERT INTO sia_cuentasdetalles " . 
 			"(idCuenta, sector, subsector, unidad, funcion, subfuncion, actividad, capitulo, partida, finalidad, progPres, fuenteFinanciamiento, fuenteGenerica, fuenteEspecifica, " . 
 			"origenRecurso, tipoGasto, digito, proyecto, destinoGasto, original, modificado, ejercido, pagado, pendiente, usrAlta, fAlta, estatus) " . 
 			"values(:cuenta,:sector, :subsector, :unidad, :funcion, :subfuncion, :actividad, :capitulo, :partida, :finalidad, :progPres, :fuenteFinanciamiento, :fuenteGenerica, :fuenteEspecifica, " . 
 			":origenRecurso, :tipoGasto, :digito, :proyecto, :destinoGasto, :original, :modificado, :ejercido, :pagado, :pendiente, :usrActual, getdate(), 'ACTIVO');";				
-			
-			
-			//$sql="INSERT INTO sia_cuentasdetalles (idCuenta, sector, fAlta) values(:cuenta,:sector, now());";					
 			$dbQuery = $db->prepare($sql);
-
 			$result="OK";
 			$nRegistros=0;
 			
@@ -423,9 +420,9 @@
 				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto, 			
 				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));						
 				$nRegistros++;			
-			}
-			
+			}			
 			echo "Registros: " . $nRegistros . "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];	
+			*/
 			
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
