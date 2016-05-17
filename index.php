@@ -409,8 +409,11 @@
 				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
 				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
 				$nRegistros++;
+				
+				if ($nRegistros==10  ||  $nRegistros==1000 ) echo "OK Interno  Registros: " . $nRegistros;
+				
 			}
-			echo "OK#2  Registros: " . $nRegistros;
+			echo "OK #2 Proceso Terminado.       Registros: " . $nRegistros;
 
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
