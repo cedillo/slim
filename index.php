@@ -552,6 +552,27 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 	 ***********************************************************************************
 	*/
 
+$app->get('/lstauditoresByID/:id', function($id)    use($app, $db) {
+			// $sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
+			// "FROM sia_diasinhabiles WHERE idDia=:id ";
+
+			$sql="SELECT Concat(nombre,' ',paterno,' ',materno)nombre ".
+			"FROM sia_auditores where idArea='DGACFA'";
+
+			$dbQuery = $db->prepare($sql);
+			$dbQuery->execute(array(':id' => $id));
+			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+			if(!$result){
+				$app->halt(404, "NO SE ENCONTRARON DATOS ");
+			}else{
+				echo json_encode($result);
+			}
+		});
+
+
+
+
+
 	//Guarda un avanceActividad
 $app->post('/guardar/avance', function()  use($app, $db) {
 		$usrActual = $_SESSION["idUsuario"];
