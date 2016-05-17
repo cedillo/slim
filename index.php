@@ -77,7 +77,7 @@
 		
 		//Registrar acceso
 		$usrActual = $_SESSION["idUsuario"];
-		$sql="INSERT INTO sia_accesos (idUsuario, fIngreso, latitud, longitud) VALUES(:usrActual, now(), :latitud, :longitud);";
+		$sql="INSERT INTO sia_accesos (idUsuario, fIngreso, latitud, longitud) VALUES(:usrActual, getdate(), :latitud, :longitud);";
 		$dbQuery = $db->prepare($sql);		
 		$dbQuery->execute(array(':usrActual' => $usrActual, ':latitud'=>$latitud, ':longitud'=>$longitud ));
 		
@@ -123,7 +123,7 @@
 	
 	$app->get('/cerrar', function() use($app, $db){
 			
-			$sql="UPDATE sia_accesos SET fEgreso=now(), estatus='INACTIVO' WHERE idUsuario=:usrActual AND estatus='ACTIVO';";
+			$sql="UPDATE sia_accesos SET fEgreso=getdate(), estatus='INACTIVO' WHERE idUsuario=:usrActual AND estatus='ACTIVO';";
 			$dbQuery = $db->prepare($sql);		
 			$dbQuery->execute(array(':usrActual'=>$_SESSION["idUsuario"]));
 			
@@ -382,7 +382,7 @@
 			"(idCuenta, sector, subsector, unidad, funcion, subfuncion, actividad, capitulo, partida, finalidad, progPres, fuenteFinanciamiento, fuenteGenerica, fuenteEspecifica, " . 
 			"origenRecurso, tipoGasto, digito, proyecto, destinoGasto, original, modificado, ejercido, pagado, pendiente, usrAlta, fAlta, estatus) " . 
 			"values(:cuenta,:sector, :subsector, :unidad, :funcion, :subfuncion, :actividad, :capitulo, :partida, :finalidad, :progPres, :fuenteFinanciamiento, :fuenteGenerica, :fuenteEspecifica, " . 
-			":origenRecurso, :tipoGasto, :digito, :proyecto, :destinoGasto, :original, :modificado, :ejercido, :pagado, :pendiente, :usrActual, now(), 'ACTIVO');";				
+			":origenRecurso, :tipoGasto, :digito, :proyecto, :destinoGasto, :original, :modificado, :ejercido, :pagado, :pendiente, :usrActual, getdate(), 'ACTIVO');";				
 			
 			
 			//$sql="INSERT INTO sia_cuentasdetalles (idCuenta, sector, fAlta) values(:cuenta,:sector, now());";					
@@ -464,7 +464,7 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 						
 		if($oper=='INS'){						
 			$sql="INSERT INTO sia_papeles (idCuenta, idPrograma, idAuditoria, idSujeto, idObjeto, idFase, tipoPapel, tipoResultado, resultado,  usrAlta, fAlta, estatus) " . 
-			"VALUES(:cuenta, :programa, :auditoria, :sujeto, :objeto, :fase, :tipoPapel, :tipoResultado, :resultado, :usrActual, now(), 'ACTIVO');";
+			"VALUES(:cuenta, :programa, :auditoria, :sujeto, :objeto, :fase, :tipoPapel, :tipoResultado, :resultado, :usrActual, getdate(), 'ACTIVO');";
 				
 			$dbQuery = $db->prepare($sql);						
 			$dbQuery->execute(array(':cuenta' => $cuenta, ':programa' => $programa, ':auditoria' => $auditoria, ':sujeto' => $sujeto, ':objeto' => $objeto, ':fase' => $fase, ':tipoPapel' => $tipoPapel,':tipoResultado' => $tipoResultado,':resultado' => $resultado, ':usrActual' => $usrActual ));
@@ -570,7 +570,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 						
 		if($oper=='INS'){						
 			$sql="INSERT INTO sia_auditoriasavances (idCuenta, idPrograma, idAuditoria, idSujeto, idObjeto, idFase, idActividad, porcentaje,  usrAlta, fAlta, estatus) " . 
-			"VALUES(:cuenta, :programa, :auditoria, :sujeto, :objeto, :fase, :actividad, :porcentaje, :usrActual, now(), 'ACTIVO');";
+			"VALUES(:cuenta, :programa, :auditoria, :sujeto, :objeto, :fase, :actividad, :porcentaje, :usrActual, getdate(), 'ACTIVO');";
 				
 			$dbQuery = $db->prepare($sql);		
 				
@@ -619,7 +619,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 			$auditoria = 'ASCM-' . date("YmdHis");
 			
 			$sql="INSERT INTO sia_auditorias (idCuenta, idPrograma, idArea, idAuditoria, tipoAuditoria, idSujeto, idObjeto, objetivo, alcance, justificacion, usrAlta, fAlta, estatus) ". 
-			"VALUES(:cuenta, :programa, :area, :auditoria, :tipo, :sujeto, :objeto, :objetivo, :alcance, :justificacion,  :usrActual, now(), 'ACTIVO');";
+			"VALUES(:cuenta, :programa, :area, :auditoria, :tipo, :sujeto, :objeto, :objetivo, :alcance, :justificacion,  :usrActual, getdate(), 'ACTIVO');";
 			$dbQuery = $db->prepare($sql);		
 			$dbQuery->execute(array(':cuenta' => $cuenta, ':programa' => $programa,':area' => $area, ':auditoria' => $auditoria, ':tipo' => $tipo, 
 			':sujeto' => $sujeto, ':objeto' => $objeto,	 ':objetivo' => $objetivo, ':alcance' => $alcance, ':justificacion' => $justificacion, ':usrActual' => $usrActual ));		
@@ -669,7 +669,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 				if ($oper=='INS-ACT'){
 					$sql="INSERT INTO sia_auditoriasactividades (" . 
 					"idCuenta, idPrograma, idAuditoria, idFase,idTipo, descripcion, idActividadPrevia, fInicio, fFin, porcentaje, idPrioridad, idImpacto, notas, idResponsable, usrAlta, fAlta, estatus) " . 
-					"values(:cuenta, :programa, :auditoria, :fase, :tipo, :descripcion, :previa,  :inicio, :fin, :porcentaje, :prioridad, :impacto,:notas,:responsable,:usrAlta,now(),'ACTIVO')";					
+					"values(:cuenta, :programa, :auditoria, :fase, :tipo, :descripcion, :previa,  :inicio, :fin, :porcentaje, :prioridad, :impacto,:notas,:responsable,:usrAlta,getdate(),'ACTIVO')";					
 					$dbQuery = $db->prepare($sql);	
 					$dbQuery->execute(array(':cuenta' => $cuenta,':programa' => $programa,':auditoria' => $auditoria,':fase' => $fase,':tipo' => $tipo,':descripcion' => $descripcion,
 					':previa' => $previa, ':inicio' => $inicio,':fin' => $fin,':porcentaje' => $porcentaje,':prioridad' => $prioridad,':impacto' => $impacto,
@@ -715,13 +715,13 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		if($oper=='INS'){
 			$cuenta = "CTA-" . $anio ;
 			$sql="INSERT INTO sia_cuentas (idCuenta, anio, nombre, fInicio, fFin, observaciones, usrAlta, fAlta, estatus) ". 
-			"VALUES(:cuenta, :anio, :nombre, :inicio, :fin, :obs, :usrActual, now(), 'ACTIVO');";
+			"VALUES(:cuenta, :anio, :nombre, :inicio, :fin, :obs, :usrActual, getdate(), 'ACTIVO');";
 			$dbQuery = $db->prepare($sql);		
 			$dbQuery->execute(array(':cuenta' => $cuenta, ':anio' => $anio, ':nombre' => $nombre, ':inicio' => $inicio, ':fin' => $fin, ':obs' => $obs,':usrActual' => $usrActual ));		
 			
 			//Crea un PGA nuevo para esta cuenta
 			$programa = 'PGA-' . $cuenta; 
-			$sql="INSERT INTO sia_programas (idCuenta, idPrograma, fRegistro, usrAlta, fAlta, estatus) VALUES(:cuenta, :programa, now(), :usrActual, now(), 'ACTIVO');";
+			$sql="INSERT INTO sia_programas (idCuenta, idPrograma, fRegistro, usrAlta, fAlta, estatus) VALUES(:cuenta, :programa, getdate(), :usrActual, getdate(), 'ACTIVO');";
 			$dbQuery = $db->prepare($sql);		
 			$dbQuery->execute(array(':cuenta' => $cuenta, ':programa' => $programa, ':usrActual' => $usrActual ));
 			
