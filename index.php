@@ -9,7 +9,7 @@
 //PRUEBA DE HECTOR
 //otra prueba
 	//prueba dos
->>>>>>> origin/master
+//>>>>>>> origin/master
 	//PRUEBA
 	
 	\Slim\Slim::registerAutoloader();
