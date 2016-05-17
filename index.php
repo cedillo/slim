@@ -373,7 +373,7 @@
 			$Sheets = $Reader -> Sheets();
 			date_default_timezone_set('UTC');			
 
-			echo "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
+			echo "Renglones: " . $Reader->sheets[0]['numRows'] . "Columnas: " . $Reader->sheets[0]['numCols'];
 
 			/*
 			
