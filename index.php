@@ -365,10 +365,6 @@
 
 
 			//Carga los importes
-
-			
-
-
 			$Reader = new SpreadsheetReader($archivo);
 			$Sheets = $Reader -> Sheets();
 			date_default_timezone_set('UTC');			
