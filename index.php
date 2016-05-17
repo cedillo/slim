@@ -350,12 +350,12 @@
 			$usrActual = $_SESSION["idUsuario"];
 			$archivo ='uploads/' . $nombre;
 
-			/*
+			
 			$data = new Spreadsheet_Excel_Reader();
 			//$data->setOutputEncoding('CP1251');
 			$data->setOutputEncoding('UTF-8');
 			$data->read($archivo);
-			*/
+			
 		
 
 			//Elimina cuenta pública
