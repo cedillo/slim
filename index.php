@@ -363,12 +363,8 @@
 			
 			$Reader = new SpreadsheetReader($archivo);
 			
-			
-			
-			
-			
 
-			/**************
+
 			//insertar 
 			$sql="INSERT INTO sia_cuentasdetalles " .
 			"(idCuenta, sector, subsector, unidad, funcion, subfuncion, actividad, capitulo, partida, finalidad, progPres, fuenteFinanciamiento, fuenteGenerica, fuenteEspecifica, " .
@@ -382,7 +378,10 @@
 
 			error_reporting(E_ALL ^ E_NOTICE);
 
-			for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
+			//for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
+			
+			foreach ($Reader as $Row)
+				/*
 				$sector = $data->sheets[0]['cells'][$i][1];
 				$subsector =  "" . $data->sheets[0]['cells'][$i][2];
 				$unidad =  "" . $data->sheets[0]['cells'][$i][3];
@@ -406,6 +405,33 @@
 				$ejercido =  "" . $data->sheets[0]['cells'][$i][21];
 				$pagado =  "" . $data->sheets[0]['cells'][$i][22];
 				$pendiente =  "" . $data->sheets[0]['cells'][$i][23];
+				*/
+				
+				$sector = $row[1];
+				$subsector =  "" . $row[2];
+				$unidad =  "" . $row[3];
+				$funcion =  "" . $row[4];
+				$subfuncion =  "" . $row[5];
+				$actividad =  "" . $row[6];
+				$capitulo =  "" . $row[7];
+				$partida =  "" . $row[8];
+				$finalidad =  "" . $row[9];
+				$progPres =  "" . $row[10];
+				$fuenteFinanciamiento =  "" . $row[11];
+				$fuenteGenerica =  "" . $row[12];
+				$fuenteEspecifica =  "" . $row[13];
+				$origenRecurso =  "" . $row[14];
+				$tipoGasto =  "" . $row[15];
+				$digito =  "" . $row[16];
+				$proyecto =  "" . $row[17];
+				$destinoGasto =  "" . $row[18];
+				$original =  "" . $row[19];
+				$modificado =  "" . $row[20];
+				$ejercido =  "" . $row[21];
+				$pagado =  "" . $row[22];
+				//$pendiente =  "" . $row[23];				
+				
+				
 
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
 				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
@@ -413,9 +439,6 @@
 				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
 				$nRegistros++;
 			}
-			
-			***************/
-			
 
 			//echo "Registros: " . $nRegistros . "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
 			echo "OK#2";
