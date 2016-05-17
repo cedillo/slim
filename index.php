@@ -350,78 +350,19 @@
 			$usrActual = $_SESSION["idUsuario"];
 			$archivo ='uploads/' . $nombre;
 
-			
-			$data = new Spreadsheet_Excel_Reader();
-			//$data->setOutputEncoding('CP1251');
-			$data->setOutputEncoding('UTF-8');
-			$data->read($archivo);
-
 			//Elimina cuenta pública
 			$sql="DELETE FROM sia_cuentasdetalles WHERE idCuenta= :cuenta ;";
 			$dbQuery = $db->prepare($sql);
 			$dbQuery->execute(array(':cuenta' => $cuenta));
 
+			//Abrir archivo de XLS
+			$data = new Spreadsheet_Excel_Reader();
+			//$data->setOutputEncoding('CP1251');
+			$data->setOutputEncoding('UTF-8');
+			$data->read($archivo);
 
 			
-			//echo "OK #1";
-			
 
-			
-			/*
-			$sql="INSERT INTO sia_cuentasdetalles " .
-			"(idCuenta, sector, subsector, unidad, funcion, subfuncion, actividad, capitulo, partida, finalidad, progPres, fuenteFinanciamiento, fuenteGenerica, fuenteEspecifica, " .
-			"origenRecurso, tipoGasto, digito, proyecto, destinoGasto, original, modificado, ejercido, pagado, pendiente, usrAlta, fAlta, estatus) " .
-			"values(:cuenta,:sector, :subsector, :unidad, :funcion, :subfuncion, :actividad, :capitulo, :partida, :finalidad, :progPres, :fuenteFinanciamiento, :fuenteGenerica, :fuenteEspecifica, " .
-			":origenRecurso, :tipoGasto, :digito, :proyecto, :destinoGasto, :original, :modificado, :ejercido, :pagado, :pendiente, :usrActual, getdate(), 'ACTIVO');";
-			*/
-			
-			//insertar 
-			$sql="INSERT INTO sia_cuentasdetalles " .
-			"(idCuenta, sector, subsector, unidad, funcion, subfuncion, actividad, capitulo, partida, finalidad, progPres, fuenteFinanciamiento, fuenteGenerica, fuenteEspecifica, " .
-			"origenRecurso, tipoGasto, digito, proyecto, destinoGasto, original, modificado, ejercido, pagado, pendiente, usrAlta, fAlta, estatus) " .
-			"values(:cuenta,:sector, :subsector, :unidad, :funcion, :subfuncion, :actividad, :capitulo, :partida, :finalidad, :progPres, :fuenteFinanciamiento, :fuenteGenerica, :fuenteEspecifica, " .
-			":origenRecurso, :tipoGasto, :digito, :proyecto, :destinoGasto, :original, :modificado, :ejercido, :pagado, :pendiente, :usrActual, getdate(), 'ACTIVO');";
-
-			$dbQuery = $db->prepare($sql);
-			$result="OK";
-			$nRegistros=0;
-
-			error_reporting(E_ALL ^ E_NOTICE);
-
-			for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
-				$sector = $data->sheets[0]['cells'][$i][1];
-				$subsector =  "" . $data->sheets[0]['cells'][$i][2];
-				$unidad =  "" . $data->sheets[0]['cells'][$i][3];
-				$funcion =  "" . $data->sheets[0]['cells'][$i][4];
-				$subfuncion =  "" . $data->sheets[0]['cells'][$i][5];
-				$actividad =  "" . $data->sheets[0]['cells'][$i][6];
-				$capitulo =  "" . $data->sheets[0]['cells'][$i][7];
-				$partida =  "" . $data->sheets[0]['cells'][$i][8];
-
-				$finalidad =  "" . $data->sheets[0]['cells'][$i][9];
-				$progPres =  "" . $data->sheets[0]['cells'][$i][10];
-				$fuenteFinanciamiento =  "" . $data->sheets[0]['cells'][$i][11];
-				$fuenteGenerica =  "" . $data->sheets[0]['cells'][$i][12];
-				$fuenteEspecifica =  "" . $data->sheets[0]['cells'][$i][13];
-				$origenRecurso =  "" . $data->sheets[0]['cells'][$i][14];
-				$tipoGasto =  "" . $data->sheets[0]['cells'][$i][15];
-				$digito =  "" . $data->sheets[0]['cells'][$i][16];
-				$proyecto =  "" . $data->sheets[0]['cells'][$i][17];
-
-				$destinoGasto =  "" . $data->sheets[0]['cells'][$i][18];
-
-				$original =  "" . $data->sheets[0]['cells'][$i][19];
-				$modificado =  "" . $data->sheets[0]['cells'][$i][20];
-				$ejercido =  "" . $data->sheets[0]['cells'][$i][21];
-				$pagado =  "" . $data->sheets[0]['cells'][$i][22];
-				$pendiente =  "" . $data->sheets[0]['cells'][$i][23];
-
-				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
-				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
-				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
-				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
-				$nRegistros++;
-			}
 
 			echo "Registros: " . $nRegistros . "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
 
