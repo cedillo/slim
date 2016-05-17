@@ -536,7 +536,7 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 	 ***********************************************************************************
 	*/
 		$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
-			$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
+			$sql="SELECT idCuenta, idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
 			"FROM sia_diasinhabiles WHERE idDia=:id ";
 			$dbQuery = $db->prepare($sql);
 			$dbQuery->execute(array(':id' => $id));
