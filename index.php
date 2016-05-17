@@ -556,7 +556,7 @@ $app->get('/lstauditoresByID/:id', function($id)    use($app, $db) {
 			// $sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
 			// "FROM sia_diasinhabiles WHERE idDia=:id ";
 
-			$sql="SELECT Concat(nombre,' ',paterno,' ',materno)nombre ".
+			$sql="SELECT Concat(nombre,' ',paterno,' ',materno)nombre idDia ".
 			"FROM sia_auditores where idArea='DGACFA'";
 
 			$dbQuery = $db->prepare($sql);
