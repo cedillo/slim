@@ -4,7 +4,7 @@
 	require 'Slim/Slim.php';
 	//require_once 'Excel/reader.php';
 	//prueba de git
-<<<<<<< HEAD
+
 
 
 	
