@@ -410,7 +410,7 @@
 				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
 				$nRegistros++;
 			}
-			echo "OK#2  Registros: " + $nRegistros;
+			echo "OK#2  Registros: " . $nRegistros;
 
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
