@@ -355,8 +355,6 @@
 			//$data->setOutputEncoding('CP1251');
 			$data->setOutputEncoding('UTF-8');
 			$data->read($archivo);
-			
-		
 
 			//Elimina cuenta pública
 			$sql="DELETE FROM sia_cuentasdetalles WHERE idCuenta= :cuenta ;";
@@ -365,16 +363,17 @@
 
 
 			
-			echo "OK #1";
+			//echo "OK #1";
 			
 
-			/*
 			
+			/*
 			$sql="INSERT INTO sia_cuentasdetalles " .
 			"(idCuenta, sector, subsector, unidad, funcion, subfuncion, actividad, capitulo, partida, finalidad, progPres, fuenteFinanciamiento, fuenteGenerica, fuenteEspecifica, " .
 			"origenRecurso, tipoGasto, digito, proyecto, destinoGasto, original, modificado, ejercido, pagado, pendiente, usrAlta, fAlta, estatus) " .
 			"values(:cuenta,:sector, :subsector, :unidad, :funcion, :subfuncion, :actividad, :capitulo, :partida, :finalidad, :progPres, :fuenteFinanciamiento, :fuenteGenerica, :fuenteEspecifica, " .
 			":origenRecurso, :tipoGasto, :digito, :proyecto, :destinoGasto, :original, :modificado, :ejercido, :pagado, :pendiente, :usrActual, getdate(), 'ACTIVO');";
+			*/
 			
 			//insertar 
 			$sql="INSERT INTO sia_cuentasdetalles " .
@@ -426,15 +425,6 @@
 
 			echo "Registros: " . $nRegistros . "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
 
-
-				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
-				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
-				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
-				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
-				$nRegistros++;
-			}
-			echo "Registros: " . $nRegistros . "Renglones: " . $data->sheets[0]['numRows'] . "Columnas: " . $data->sheets[0]['numCols'];
-			*/
 
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
