@@ -173,14 +173,14 @@
 	});
 
 
-	// Inicio nuevo Código HVS 20160511 06:30
+		// Inicio nuevo Código HVS 20160511 06:30
 	//CODIGO PHP
 
 	$app->get('/catInhabiles', function()  use ($app, $db) {
 		//$cuenta = $_SESSION["idCuentaActual"];
-
-		$sql="SELECT dh.idCuenta idCta, dh.idDia idDia, dh.tipo tipo, dh.nombre nombre, CONVERT(VARCHAR(12),dh.fInicio,102) fInicio, CONVERT(VARCHAR(12),dh.fFin,102) fFin, dh.estatus estatus FROM sia_diasinhabiles dh ORDER BY  dh.idCuenta, dh.idDia DESC";
-		$dbQuery = $db->prepare($sql);
+		
+		$sql="SELECT dh.idCuenta idCta, dh.idDia idDia, dh.tipo tipo, dh.nombre nombre, CONVERT(VARCHAR(12),dh.fInicio,102) fInicio, CONVERT(VARCHAR(12),dh.fFin,102) fFin, dh.estatus estatus FROM sia_diasinhabiles dh ORDER BY  dh.idCuenta, dh.idDia DESC";				
+		$dbQuery = $db->prepare($sql);		
 //		$dbQuery->execute(array(':cuenta' => $cuenta));
 		$dbQuery->execute();
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
@@ -188,9 +188,9 @@
 			$app->halt(404, "NO SE ENCONTRARON DATOS.");
 		}else{
 			$app->render('catInhabiles.php', $result);
-		}
-	})->name('listaInhabiles');
-
+		}	
+	})->name('listaInhabiles');	
+	
 	// Fin nuevo Código HVS 20160511 06:30
 
 
@@ -571,26 +571,26 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 		}
 	});
 
-	/* **********************************************************************************
-		INICIA CODIGO HVS 2016/05/17
-	 ***********************************************************************************
-	*/
-		$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
-			$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
-			"FROM sia_diasinhabiles WHERE idDia=:id ";
-			$dbQuery = $db->prepare($sql);
-			$dbQuery->execute(array(':id' => $id));
-			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
-			if(!$result){
-				$app->halt(404, "NO SE ENCONTRARON DATOS ");
-			}else{
-				echo json_encode($result);
-			}
-		});
-	/* **********************************************************************************
-		FINALIZA CODIGO HVS 2016/05/17
-	 ***********************************************************************************
-	*/
+/* **********************************************************************************
+	INICIA CODIGO HVS 2016/05/17
+ ***********************************************************************************
+*/
+	$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {		
+		$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
+		"FROM sia_diasinhabiles WHERE idDia=:id ";
+		$dbQuery = $db->prepare($sql);		
+		$dbQuery->execute(array(':id' => $id));
+		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+		if(!$result){
+			$app->halt(404, "NO SE ENCONTRARON DATOS ");
+		}else{			
+			echo json_encode($result);
+		}
+	});	
+/* **********************************************************************************
+	FINALIZA CODIGO HVS 2016/05/17
+ ***********************************************************************************
+*/
 
 	//Guarda un avanceActividad
 $app->post('/guardar/avance', function()  use($app, $db) {
@@ -832,23 +832,23 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		$cuenta = $_SESSION["idCuentaActual"];
 
 		$request=$app->request;
-
+					
 		//$cuenta = $request->post('txtCuenta');
-		$dia = $request->post('txtDia');
-		$tipo = $request->post('txtTipo');
-		$nombre = strtoupper($request->post('txtNombre'));
-
+		$dia = $request->post('txtDia');	
+		$tipo = $request->post('txtTipo');	
+		$nombre = strtoupper($request->post('txtNombre'));		
+		
 		//$fInicio = $request->post('txtFechaInicial');
 		$fInicio = date_create(($request->post('txtFechaInicial')));
-		$fInicio = $fInicio->format('Y-m-d');
+		$fInicio = $fInicio->format('Y-m-d');				
 
 		//$fFin = $request->post('txtFechaFinal');
 		$fFin = date_create(($request->post('txtFechaFinal')));
-		$fFin = $fFin->format('Y-m-d');
+		$fFin = $fFin->format('Y-m-d');				
 
 		$estatus = $request->post('txtEstatus');
-
-		$oper = $request->post('txtOperacion');
+	
+		$oper = $request->post('txtOperacion');		
 
 		//echo nl2br("\nEl valor de Oper es: ".$oper);
 		//echo nl2br("\nValor usrActual ".$usrActual);
@@ -863,8 +863,8 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		try
 		{
 			if($oper=='INS')
-			{
-				$sql="INSERT INTO sia_diasinhabiles (idCuenta, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus) " .
+			{						
+				$sql="INSERT INTO sia_diasinhabiles (idCuenta, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus) " . 
 				"VALUES(:cuenta, :tipo, :nombre, :fInicio, :fFin, :usrActual, getdate(), 'ACTIVO');";
 				$dbQuery = $db->prepare($sql);
 
@@ -873,10 +873,10 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 			}else{
 
-				$sql="UPDATE sia_diasinhabiles SET " .
-				"idCuenta=:cuenta, tipo=:tipo, nombre=:nombre, fInicio=:fInicio, fFin=:fFin, usrModificacion=:usrActual, " .
-				" fModificacion=getdate(), estatus=:estatus WHERE idDia =:dia";
-				$dbQuery = $db->prepare($sql);
+				$sql="UPDATE sia_diasinhabiles SET " . 
+				"idCuenta=:cuenta, tipo=:tipo, nombre=:nombre, fInicio=:fInicio, fFin=:fFin, usrModificacion=:usrActual, " . 
+				" fModificacion=getdate(), estatus=:estatus WHERE idDia =:dia"; 
+				$dbQuery = $db->prepare($sql);			
 
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':tipo' => $tipo, ':nombre' => $nombre, ':fInicio' => $fInicio, ':fFin' => $fFin, ':usrActual' => $usrActual, ':estatus' => $estatus, ':dia' => $dia));
 				//echo "<br>UPD OK";
@@ -890,13 +890,9 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 			die();
 		}
 		$app->redirect($app->urlFor('listaInhabiles'));
-	});
+	});	
 
 	// Fin Nuevo Código HVS 20160512 09:30
-
-
-
-
 
 	//Lista de Areas
 	$app->get('/lstAreas', function()    use($app, $db) {
