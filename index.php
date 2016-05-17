@@ -364,21 +364,8 @@
 			$dbQuery->execute(array(':cuenta' => $cuenta));
 
 
-			//Carga los importes
-			$Reader = new SpreadsheetReader($archivo);
-			date_default_timezone_set('UTC');			
 			
-			$Sheets = $Reader -> Sheets();
-			$hojas="";
-			foreach ($Sheets as $Index => $Name)
-			{
-				$hojas = $hojas . '\nHoja  #'.$Index.': '.$Name;
-				//$Reader -> ChangeSheet($Index);
-			}
-
-			//echo "Renglones: " . $Reader->sheets[0]['numRows'] . "Columnas: " . $Reader->sheets[0]['numCols'];
-			
-			echo $hojas;
+			echo "OK #1";
 			
 
 			/*
