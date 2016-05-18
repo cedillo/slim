@@ -40,7 +40,17 @@
 		$latitud = $request->post('txtLatitud');
 		$longitud = $request->post('txtLongitud');
 
-		$dbQuery = $db->prepare("SELECT idUsuario, CONCAT(nombre, ' ', paterno, ' ', materno) nombre FROM sia_usuarios WHERE usuario=:cuenta and pwd=:pass");
+		
+		$sql = "SELECT u.idUsuario, u.idEmpleado, CONCAT(u.nombre, ' ', u.paterno, ' ', u.materno) nombre, e.idArea, p.nombre sPlaza " .
+		"FROM sia_usuarios u " .
+		"inner join sia_empleados e on u.idEmpleado=e.idEmpleado " . 
+		"inner join sia_plazas p on e.idArea = p.idArea and e.idNivel = p.idNivel and e.idNombramiento = p.idNombramiento and e.idPuesto = p.idPuesto and e.idPlaza = p.idPlaza " .
+		" WHERE usuario=:cuenta and pwd=:pass";
+		
+		
+		//$dbQuery = $db->prepare("SELECT idUsuario, rpe, CONCAT(nombre, ' ', paterno, ' ', materno) nombre FROM sia_usuarios WHERE usuario=:cuenta and pwd=:pass");
+		$dbQuery = $db->prepare($sql);
+		
 		$dbQuery->execute(array(':cuenta' => $cuenta, ':pass' => $pass));
 		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
 		if($result){
@@ -48,6 +58,10 @@
 		$_SESSION["logueado"] =1;
 		$_SESSION["idUsuario"] =$result['idUsuario'];
 		$_SESSION["sUsuario"] =$result['nombre'];
+		
+		$_SESSION["idEmpleado"] =$result['idEmpleado'];
+		$_SESSION["idArea"] =$result['idArea'];
+		$_SESSION["sPlaza"] =$result['sPlaza'];
 
 
 		//Obtener datos generales
