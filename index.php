@@ -427,7 +427,8 @@
 				
 				$nRegistros++;
 				
-				$valores = $valores . "\n Registro #" . $nRegistros . " Original:"  . $sector . " Modificado:"  . $subsector;
+				//$valores = $valores . "\n Registro #" . $nRegistros . " Sector:"  . $sector . " Subsector:"  . $subsector;
+				$valores = $valores . "\n" . $row;
 				
 				if ($nRegistros==10) break;
 				
