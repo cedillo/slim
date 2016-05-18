@@ -429,12 +429,15 @@
 				$pagado =  "" . $row[21];
 				$pendiente =  "" . $row[22];	
 								
-				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
-				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
-				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
-				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));				
+				if ($nRegistros>0){
+					$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
+					':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
+					':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
+					':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));				
+				}
 				
-				$nRegistros++;				
+				$nRegistros++;	
+				
 				$valores = $valores . "\n Registro #" . $nRegistros . " "  . $row[0] . " "  . $row[1] . " "  . $row[2] . " "  . $row[3] . " "  . $row[4] . " "  . $row[5] . " "  . $row[6] . " "  . $row[7];
 				$valores = $valores . " "  . $row[8] . " "  . $row[9] . " "  . $row[10] . " "  . $row[11] . " "  . $row[12] . " "  . $row[13] . " "  . $row[14] . " "  . $row[15] . " "  . $row[16] . " "  . $row[17];
 				$valores = $valores . " "  . $row[18] . " "  . $row[19] . " "  . $row[20] . " "  . $row[21] . " "  . $row[22];
@@ -565,36 +568,18 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 		INICIA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
 	*/
-		// Obten los registro que cumplan con el día inhábil
-	$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
-		$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
-		"FROM sia_diasinhabiles WHERE idDia=:id ";
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':id' => $id));
-		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS ");
-		}else{
-			echo json_encode($result);
-		}
-	});
-
-	// Obten los registro que cumplan con el tipo de auditoría enviado
-	$app->get('/lstCriteriosByTipoAuditoria/:id', function($id)    use($app, $db) {
-		echo($id);
-		$sql="SELECT idCriterio id, nombre texto FROM sia_criterios WHERE idTipoAuditoria=:id order by nombre";
-
-		$dbQuery = $db->prepare($sql);
-		//$dbQuery->execute();
-		$dbQuery->execute(array(':id' => $id));
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		echo($result);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON CRITERIOS PARA MOSTRAR ");
-		}else{
-			echo json_encode($result);
-		}
-	});
+		$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
+			$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
+			"FROM sia_diasinhabiles WHERE idDia=:id ";
+			$dbQuery = $db->prepare($sql);
+			$dbQuery->execute(array(':id' => $id));
+			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+			if(!$result){
+				$app->halt(404, "NO SE ENCONTRARON DATOS ");
+			}else{
+				echo json_encode($result);
+			}
+		});
 	/* **********************************************************************************
 		FINALIZA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
