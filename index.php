@@ -565,6 +565,24 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 		INICIA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
 	*/
+
+
+	//lista de auditores
+ 		$app->get('/lstAuditoresByID/:id', function($id)    use($app, $db) {
+ 			$sql="SELECT CONCAT(au.nombre,' ',au.paterno,' ',au.materno) nombre, p.nombre puesto " .
+ 				"FROM sia_empleados au LEFT JOIN sia_plazas p on au.idPlaza = p.idPlaza where au.idArea='DGACFA'";
+ 			$dbQuery = $db->prepare($sql);
+ 			$dbQuery->execute(array(':id' => $id));
+ 			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+ 			if(!$result){
+ 				$app->halt(404, "NO SE ENCONTRARON DATOS ");
+ 			}else{
+ 				echo json_encode($result);
+ 			}
+ 		});	
+
+
+
 		// Obten los registro que cumplan con el día inhábil
 	$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
 		$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
