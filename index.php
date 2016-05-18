@@ -380,7 +380,7 @@
 			
 			//$Reader = new SpreadsheetReader($archivo);
 			
-			$xlsx = new SimpleXLSX('countries_and_population.xlsx');
+			$xlsx = new SimpleXLSX($archivo);
 			list($num_cols, $num_rows) = $xlsx->dimension();
 			
 
@@ -403,30 +403,29 @@
 			
 			foreach( $xlsx->rows() as $row ) {
 				
-				$sector = $row[1];
-				$subsector =  "" . $row[2];
-				$unidad =  "" . $row[3];
-				$funcion =  "" . $row[4];
-				$subfuncion =  "" . $row[5];
-				$actividad =  "" . $row[6];
-				$capitulo =  "" . $row[7];
-				$partida =  "" . $row[8];
-				$finalidad =  "" . $row[9];
-				$progPres =  "" . $row[10];
-				$fuenteFinanciamiento =  "" . $row[11];
-				$fuenteGenerica =  "" . $row[12];
-				$fuenteEspecifica =  "" . $row[13];
-				$origenRecurso =  "" . $row[14];
-				$tipoGasto =  "" . $row[15];
-				$digito =  "" . $row[16];
-				$proyecto =  "" . $row[17];
-				$destinoGasto =  "" . $row[18];
-				$original =  "" . $row[19];
-				$modificado =  "" . $row[20];
-				$ejercido =  "" . $row[21];
-				$pagado =  "" . $row[22];
-				$pendiente =  "" . $row[23];	
-
+				$sector = $row[0];
+				$subsector =  "" . $row[1];
+				$unidad =  "" . $row[2];
+				$funcion =  "" . $row[3];
+				$subfuncion =  "" . $row[4];
+				$actividad =  "" . $row[5];
+				$capitulo =  "" . $row[6];
+				$partida =  "" . $row[7];
+				$finalidad =  "" . $row[8];
+				$progPres =  "" . $row[9];
+				$fuenteFinanciamiento =  "" . $row[10];
+				$fuenteGenerica =  "" . $row[11];
+				$fuenteEspecifica =  "" . $row[12];
+				$origenRecurso =  "" . $row[13];
+				$tipoGasto =  "" . $row[14];
+				$digito =  "" . $row[15];
+				$proyecto =  "" . $row[16];
+				$destinoGasto =  "" . $row[17];
+				$original =  "" . $row[18];
+				$modificado =  "" . $row[19];
+				$ejercido =  "" . $row[20];
+				$pagado =  "" . $row[21];
+				$pendiente =  "" . $row[22];	
 				
 				
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
@@ -553,8 +552,7 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 
 
 	$app->get('/tblActividadesByAuditoria/:id', function($id)    use($app, $db) {
-		$sql="SELECT idFase fase, descripcion actividad, fInicio inicio, fFin fin, porcentaje, idPrioridad prioridad  " .
-		"FROM sia_auditoriasactividades  WHERE idAuditoria=:id ";
+		$sql="SELECT idFase fase, descripcion actividad, fInicio inicio, fFin fin, porcentaje, idPrioridad prioridad  FROM sia_auditoriasactividades  WHERE idAuditoria=:id ";
 		$dbQuery = $db->prepare($sql);
 		$dbQuery->execute(array(':id' => $id));
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
@@ -566,57 +564,25 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 	});
 
 	/* **********************************************************************************
-		INICIA CODIGO HVS INICO EN 2016/05/17
+		INICIA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
-	*/ Obten los registro que cumplan con el día inhábil
-	$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
-		$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
-		"FROM sia_diasinhabiles WHERE idDia=:id ";
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':id' => $id));
-		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS ");
-		}else{
-			echo json_encode($result);
-		}
-	});
-
-	// Obten los registro que cumplan con el tipo de auditoría enviado
-	$app->get('/lstCriteriosByTipoAuditoria/:id', function($id)    use($app, $db) {
-		echo($id);
-		$sql="SELECT idCriterio id, nombre texto FROM sia_criterios WHERE idTipoAuditoria=:id order by nombre";
-
-		$dbQuery = $db->prepare($sql);
-		//$dbQuery->execute();
-		$dbQuery->execute(array(':id' => $id));
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		echo($result);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON CRITERIOS PARA MOSTRAR ");
-		}else{
-			echo json_encode($result);
-		}
-	});
-
+	*/
+		$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
+			$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
+			"FROM sia_diasinhabiles WHERE idDia=:id ";
+			$dbQuery = $db->prepare($sql);
+			$dbQuery->execute(array(':id' => $id));
+			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+			if(!$result){
+				$app->halt(404, "NO SE ENCONTRARON DATOS ");
+			}else{
+				echo json_encode($result);
+			}
+		});
 	/* **********************************************************************************
-		FINALIZA CODIGO HVS 
+		FINALIZA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
-	*/	 
-
-//lista de auditores
- 		$app->get('/lstAuditoresByID/:id', function($id)    use($app, $db) {
- 			$sql="SELECT CONCAT(au.nombre,' ',au.paterno,' ',au.materno) nombre, p.nombre puesto " .
- 				"FROM sia_empleados au LEFT JOIN sia_plazas p on au.idPlaza = p.idPlaza where au.idArea='DGACFA'";
- 			$dbQuery = $db->prepare($sql);
- 			$dbQuery->execute(array(':id' => $id));
- 			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
- 			if(!$result){
- 				$app->halt(404, "NO SE ENCONTRARON DATOS ");
- 			}else{
- 				echo json_encode($result);
- 			}
- 		});
+	*/
 
 	//Guarda un avanceActividad
 $app->post('/guardar/avance', function()  use($app, $db) {
@@ -975,9 +941,10 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		$cuenta = $_SESSION["idCuentaActual"];
 		$area = $_SESSION["idArea"];
 		
-		$sql="SELECT ltrim(idUnidad) id, nombre texto FROM sia_unidades Where idCuenta=:cuenta and idSector=:sector and idSubsector=:subsector ORDER BY nombre";
+		$sql="SELECT ltrim(idUnidad) id, nombre texto FROM sia_unidades WHERE idCuenta=:cuenta AND idSector=:sector AND idSubsector=:subsector ORDER BY nombre;";
+		
 		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector, ':area' => $area));
+		$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector));
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
 		if(!$result){
 			$app->halt(404, "NO SE ENCONTRARON DATOS ");
