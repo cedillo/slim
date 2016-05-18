@@ -581,9 +581,9 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 
 	// Obten los registro que cumplan con el tipo de auditoría enviado
 	$app->get('/lstCriteriosByTipoAuditoria/:id', function($id)    use($app, $db) {
-		echo($id);
 		$sql="SELECT idCriterio id, nombre texto FROM sia_criterios WHERE idTipoAuditoria=:id order by nombre";
 
+		echo($sql);
 		$dbQuery = $db->prepare($sql);
 		//$dbQuery->execute();
 		$dbQuery->execute(array(':id' => $id));
