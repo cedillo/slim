@@ -420,20 +420,17 @@
 				$pagado =  "" . $row[22];
 				$pendiente =  "" . $row[23];	
 
-
-				
-				
-				//$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
-				//':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
-				//':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
-				//':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
+				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
+				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
+				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));				
 				
 				$nRegistros++;
 				
 				$valores = $valores . "\n Registro #" . $nRegistros . " Original:"  . $original . " Modificado:"  . $modificado;
 				
-				if ($nRegistros==10  ||  $nRegistros==1000 ) break;
-				echo "\nOK Interno  Registros: " . $nRegistros . " Modif: " . $modificado;
+				if ($nRegistros==10) break;
+				//echo "\nOK Interno  Registros: " . $nRegistros . " Modif: " . $modificado;
 				
 			}
 			echo $valores;
@@ -574,25 +571,6 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 		FINALIZA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
 	*/
-
-		//lista de auditores
-		$app->get('/lstAuditoresByID/:valor', function($id)    use($app, $db) {
-			$sql="SELECT CONCAT(au.nombre,' ',au.paterno,' ',au.materno) nombre, p.nombre puesto " .
-				"FROM sia_auditores au LEFT JOIN sia_plazas p on au.idPlaza = p.idPlaza where au.idArea='DGACFA'";
-			$dbQuery = $db->prepare($sql);
-			$dbQuery->execute(array(':id' => $id));
-			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
-			if(!$result){
-				$app->halt(404, "NO SE ENCONTRARON DATOS ");
-			}else{
-				echo json_encode($result);
-			}
-		});
-
-
-
-
-
 
 	//Guarda un avanceActividad
 $app->post('/guardar/avance', function()  use($app, $db) {
