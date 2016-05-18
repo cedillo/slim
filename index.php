@@ -582,6 +582,7 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 		//$dbQuery->execute();
 		$dbQuery->execute(array(':id' => $id));
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
+		echo($result);
 		if(!$result){
 			$app->halt(404, "NO SE ENCONTRARON CRITERIOS PARA MOSTRAR ");
 		}else{
