@@ -364,6 +364,7 @@
 
 	$app->get('/cargarArchivo/Egreso/:nombre/:cuenta', function($nombre, $cuenta)    use($app, $db) {
 
+	
 		try{
 			$usrActual = $_SESSION["idUsuario"];
 			$archivo ='uploads/' . $nombre;
