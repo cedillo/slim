@@ -391,10 +391,50 @@
 			$valores ="CADENA INTERNA: ";
 
 			error_reporting(E_ALL ^ E_NOTICE);
+			
+			foreach ($Reader as $Row){
+				
+				$sector = $row[1];
+				$subsector =  "" . $row[2];
+				$unidad =  "" . $row[3];
+				$funcion =  "" . $row[4];
+				$subfuncion =  "" . $row[5];
+				$actividad =  "" . $row[6];
+				$capitulo =  "" . $row[7];
+				$partida =  "" . $row[8];
+				$finalidad =  "" . $row[9];
+				$progPres =  "" . $row[10];
+				$fuenteFinanciamiento =  "" . $row[11];
+				$fuenteGenerica =  "" . $row[12];
+				$fuenteEspecifica =  "" . $row[13];
+				$origenRecurso =  "" . $row[14];
+				$tipoGasto =  "" . $row[15];
+				$digito =  "" . $row[16];
+				$proyecto =  "" . $row[17];
+				$destinoGasto =  "" . $row[18];
+				$original =  "" . $row[19];
+				$modificado =  "" . $row[20];
+				$ejercido =  "" . $row[21];
+				$pagado =  "" . $row[22];
+				$pendiente =  "" . $row[23];	
 
-			//for ($i = 2; $i <= $data->sheets[0]['numRows']; $i++) {
-			
-			
+				
+				
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
+				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
+				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
+				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));				
+				
+				$nRegistros++;
+				
+				$valores = $valores . "\n Registro #" . $nRegistros . " Original:"  . $original . " Modificado:"  . $modificado;
+				
+				if ($nRegistros==10) break;
+				
+				//echo "\nOK Interno  Registros : " . $nRegistros . " Modif: " . $modificado;
+				
+			}
+			echo $valores;
 
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
