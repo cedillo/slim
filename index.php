@@ -401,48 +401,7 @@
 			
 			//foreach ($Reader as $Row){
 			
-			foreach( $xlsx->rows() as $row ) {
-				
-				$sector = $row[0];
-				$subsector =  "" . $row[1];
-				$unidad =  "" . $row[2];
-				$funcion =  "" . $row[3];
-				$subfuncion =  "" . $row[4];
-				$actividad =  "" . $row[5];
-				$capitulo =  "" . $row[6];
-				$partida =  "" . $row[7];
-				$finalidad =  "" . $row[8];
-				$progPres =  "" . $row[9];
-				$fuenteFinanciamiento =  "" . $row[10];
-				$fuenteGenerica =  "" . $row[11];
-				$fuenteEspecifica =  "" . $row[12];
-				$origenRecurso =  "" . $row[13];
-				$tipoGasto =  "" . $row[14];
-				$digito =  "" . $row[15];
-				$proyecto =  "" . $row[16];
-				$destinoGasto =  "" . $row[17];
-				$original =  "" . $row[18];
-				$modificado =  "" . $row[19];
-				$ejercido =  "" . $row[20];
-				$pagado =  "" . $row[21];
-				$pendiente =  "" . $row[22];	
-				
-				
-				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
-				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
-				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
-				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));				
-				
-				$nRegistros++;
-				
-				$valores = $valores . "\n Registro #" . $nRegistros . " Sector:"  . $sector . " Subsector:"  . $subsector;
-				//$valores = $valores . "\n" . $row;
-				
-				if ($nRegistros==10) break;
-				
-				//echo "\nOK Interno  Registros : " . $nRegistros . " Modif: " . $modificado;
-				
-			}
+
 			echo $valores;
 
 		}catch (Exception $e) {
