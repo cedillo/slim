@@ -2,8 +2,11 @@
 	session_start();
 	require 'src/conexion.php';
 	require 'Slim/Slim.php';	
-	require('Excel/php-excel-reader/excel_reader2.php');
-	require('Excel/SpreadsheetReader.php');
+	//require('Excel/php-excel-reader/excel_reader2.php');
+	//require('Excel/SpreadsheetReader.php');
+
+	include 'Excel/simplexlsx.class.php';
+
 
 	\Slim\Slim::registerAutoloader();
 	$app = new \Slim\Slim();
@@ -375,7 +378,11 @@
 			//$data->setOutputEncoding('UTF-8');
 			//$data->read($archivo);
 			
-			$Reader = new SpreadsheetReader($archivo);
+			//$Reader = new SpreadsheetReader($archivo);
+			
+			$xlsx = new SimpleXLSX('countries_and_population.xlsx');
+			list($num_cols, $num_rows) = $xlsx->dimension();
+			
 
 			//insertar 
 			$sql="INSERT INTO sia_cuentasdetalles " .
@@ -392,7 +399,9 @@
 
 			error_reporting(E_ALL ^ E_NOTICE);
 			
-			foreach ($Reader as $Row){
+			//foreach ($Reader as $Row){
+			
+			foreach( $xlsx->rows() as $row ) {
 				
 				$sector = $row[1];
 				$subsector =  "" . $row[2];
@@ -427,8 +436,8 @@
 				
 				$nRegistros++;
 				
-				//$valores = $valores . "\n Registro #" . $nRegistros . " Sector:"  . $sector . " Subsector:"  . $subsector;
-				$valores = $valores . "\n" . $row;
+				$valores = $valores . "\n Registro #" . $nRegistros . " Sector:"  . $sector . " Subsector:"  . $subsector;
+				//$valores = $valores . "\n" . $row;
 				
 				if ($nRegistros==10) break;
 				
@@ -438,9 +447,9 @@
 			echo $valores;
 
 		}catch (Exception $e) {
-				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
-				//die();
-			}
+			echo  "<br>¡Error en el TRY!: " . $e->getMessage();
+			//die();
+		}
 			
 			
 			
@@ -964,9 +973,11 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 	//Lista de unidades by
 	$app->get('/lstUnidadesBySectorSubsector/:sector/:subsector', function($sector, $subsector)    use($app, $db) {
 		$cuenta = $_SESSION["idCuentaActual"];
+		$area = $_SESSION["idArea"];
+		
 		$sql="SELECT ltrim(idUnidad) id, nombre texto FROM sia_unidades Where idCuenta=:cuenta and idSector=:sector and idSubsector=:subsector ORDER BY nombre";
 		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector));
+		$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector, ':area' => $area));
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
 		if(!$result){
 			$app->halt(404, "NO SE ENCONTRARON DATOS ");
