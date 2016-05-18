@@ -664,7 +664,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 	});
 
 
-
+// DATO
 	$app->get('/guardar/auditoria/actividad/:oper/:cadena',  function($oper, $cadena)  use($app, $db) {
 		$datos= $cadena;
 		$usrActual = $_SESSION["idUsuario"];
