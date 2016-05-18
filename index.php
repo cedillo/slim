@@ -568,7 +568,8 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 	/* **********************************************************************************
 		INICIA CODIGO HVS INICO EN 2016/05/17
 	 ***********************************************************************************
-	*/ Obten los registro que cumplan con el día inhábil
+	*/ 
+	// Obten los registro que cumplan con el día inhábil
 	$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
 		$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
 		"FROM sia_diasinhabiles WHERE idDia=:id ";
