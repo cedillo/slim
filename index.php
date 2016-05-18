@@ -936,21 +936,10 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		}
 	});
 
+	
 	//Lista de unidades by
 	$app->get('/lstUnidadesBySectorSubsector/:sector/:subsector', function($sector, $subsector)    use($app, $db) {
-		$cuenta = $_SESSION["idCuentaActual"];
-		$area = $_SESSION["idArea"];
-		
-		$sql="SELECT ltrim(idUnidad) id, nombre texto FROM sia_unidades WHERE idCuenta=:cuenta AND idSector=:sector AND idSubsector=:subsector ORDER BY nombre;";
-		
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector));
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS ");
-		}else{
-			echo json_encode($result);
-		}
+
 	});
 
 
