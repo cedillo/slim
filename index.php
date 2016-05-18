@@ -435,7 +435,10 @@
 				':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));				
 				
 				$nRegistros++;				
-				$valores = $valores . "\n Registro #" . $nRegistros . " Sector:"  . $sector . " Subsector:"  . $subsector;
+				$valores = $valores . "\n Registro #" . $nRegistros . " "  . $row[0] . " "  . $row[1] . " "  . $row[2] . " "  . $row[3] . " "  . $row[4] . " "  . $row[5] . " "  . $row[6] . " "  . $row[7];
+				$valores = $valores . " "  . $row[8] . " "  . $row[9] . " "  . $row[10] . " "  . $row[11] . " "  . $row[12] . " "  . $row[13] . " "  . $row[14] . " "  . $row[15] . " "  . $row[16] . " "  . $row[17];
+				$valores = $valores . " "  . $row[18] . " "  . $row[19] . " "  . $row[20] . " "  . $row[21] . " "  . $row[22];
+				
 				if ($nRegistros==10) break;
 			}
 			echo $valores;
