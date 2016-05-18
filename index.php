@@ -562,18 +562,36 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 		INICIA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
 	*/
-		$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
-			$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
-			"FROM sia_diasinhabiles WHERE idDia=:id ";
-			$dbQuery = $db->prepare($sql);
-			$dbQuery->execute(array(':id' => $id));
-			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
-			if(!$result){
-				$app->halt(404, "NO SE ENCONTRARON DATOS ");
-			}else{
-				echo json_encode($result);
-			}
-		});
+		// Obten los registro que cumplan con el día inhábil
+	$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
+		$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
+		"FROM sia_diasinhabiles WHERE idDia=:id ";
+		$dbQuery = $db->prepare($sql);
+		$dbQuery->execute(array(':id' => $id));
+		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+		if(!$result){
+			$app->halt(404, "NO SE ENCONTRARON DATOS ");
+		}else{
+			echo json_encode($result);
+		}
+	});
+
+	// Obten los registro que cumplan con el tipo de auditoría enviado
+	$app->get('/lstCriteriosByTipoAuditoria/:id', function($id)    use($app, $db) {
+		echo($id);
+		$sql="SELECT idCriterio id, nombre texto FROM sia_criterios WHERE idTipoAuditoria=:id order by nombre";
+
+		$dbQuery = $db->prepare($sql);
+		//$dbQuery->execute();
+		$dbQuery->execute(array(':id' => $id));
+		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
+		echo($result);
+		if(!$result){
+			$app->halt(404, "NO SE ENCONTRARON CRITERIOS PARA MOSTRAR ");
+		}else{
+			echo json_encode($result);
+		}
+	});
 	/* **********************************************************************************
 		FINALIZA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
