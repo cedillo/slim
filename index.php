@@ -427,15 +427,14 @@
 				
 				$nRegistros++;
 				
-				//$valores = $valores . "\n Registro #" . $nRegistros . " Sector:"  . $sector . " Subsector:"  . $subsector;
-				$valores = $valores . "\n" . $row;
+
 				
 				if ($nRegistros==10) break;
 				
 				//echo "\nOK Interno  Registros : " . $nRegistros . " Modif: " . $modificado;
 				
 			}
-			echo $valores;
+			//echo $valores;
 
 		}catch (Exception $e) {
 				echo  "<br>¡Error en el TRY!: " . $e->getMessage();
