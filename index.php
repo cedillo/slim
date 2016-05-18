@@ -421,6 +421,7 @@
 				$pendiente =  "" . $row[23];	
 
 				
+				
 				$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
 				':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
 				':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
@@ -431,7 +432,8 @@
 				$valores = $valores . "\n Registro #" . $nRegistros . " Original:"  . $original . " Modificado:"  . $modificado;
 				
 				if ($nRegistros==10) break;
-				//echo "\nOK Interno  Registros: " . $nRegistros . " Modif: " . $modificado;
+				
+				//echo "\nOK Interno  Registros : " . $nRegistros . " Modif: " . $modificado;
 				
 			}
 			echo $valores;
