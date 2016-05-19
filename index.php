@@ -931,6 +931,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		echo nl2br("\nValor elementos: ".$elementos);
 		//echo nl2br("\nValor estatus: ".$estatus);
   
+  		/*	
 		try
 		{
 			if($oper=='INS')
@@ -949,7 +950,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 				"WHERE idCuenta=:cuenta and idPrograma=:programa and idAuditoria=:auditoria ";
 				$dbQuery = $db->prepare($sql);
 
-				$dbQuery->execute(array(':criterio' => $criterio, ':justificacion' => $justificacion, ':elementos' => $elementos, ':usrActual' => $usrActual,':cuenta' => $cuenta, ':programa:' => $programa, ':auditoria' => $auditoria ));
+				$dbQuery->execute(array(':criterio' => $criterio, ':justificacion' => $justificacion, ':elementos' => $elementos, ':usrActual' => $usrActual, ':cuenta' => $cuenta, ':programa:' => $programa, ':auditoria' => $auditoria ));
 			}
 
 			echo nl2br("\nQuery Ejecutado : ".$sql);
@@ -958,6 +959,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 			print "¡Error!: " . $e->getMessage() . "<br/>";
 			die();
 		}
+		*/
 		//$app->redirect($app->urlFor('listaAuditoriaCriterios'));
 	});
 
