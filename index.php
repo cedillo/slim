@@ -580,21 +580,20 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 	});
 
 	// Obten los registro que cumplan con el tipo de auditoría enviado
-	$app->get('/lstCriteriosByTipoAuditoria/:id', function($id)    use($app, $db) {
-		$sql="SELECT idCriterio id, nombre texto FROM sia_criterios WHERE idTipoAuditoria=:id order by nombre";
+	$app->get('/lstCriteriosByTipoAuditoria/:id', function($id)  use($app, $db) {
 
-		echo($sql);
+		$sql="SELECT idCriterio id, nombre texto FROM sia_criterios Where idTipoAuditoria=:id";
+
 		$dbQuery = $db->prepare($sql);
-		//$dbQuery->execute();
 		$dbQuery->execute(array(':id' => $id));
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		echo($result);
 		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON CRITERIOS PARA MOSTRAR ");
+			$app->halt(404, "NO SE ENCONTRARON CRITERIOS PARA MOSTRAR. ");
 		}else{
 			echo json_encode($result);
 		}
 	});
+
 	/* **********************************************************************************
 		FINALIZA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
