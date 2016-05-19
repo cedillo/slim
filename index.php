@@ -375,16 +375,8 @@
 			$dbQuery->execute(array(':cuenta' => $cuenta));
 
 			//Abrir archivo de XLS
-			//$data = new Spreadsheet_Excel_Reader();
-			//$data->setOutputEncoding('CP1251');
-			//$data->setOutputEncoding('UTF-8');
-			//$data->read($archivo);
-			
-			//$Reader = new SpreadsheetReader($archivo);
-			
 			$xlsx = new SimpleXLSX($archivo);
-			list($num_cols, $num_rows) = $xlsx->dimension();
-			
+			list($num_cols, $num_rows) = $xlsx->dimension();			
 
 			//insertar 
 			$sql="INSERT INTO sia_cuentasdetalles " .
@@ -394,17 +386,12 @@
 			":origenRecurso, :tipoGasto, :digito, :proyecto, :destinoGasto, :original, :modificado, :ejercido, :pagado, :pendiente, :usrActual, getdate(), 'ACTIVO');";
 
 			$dbQuery = $db->prepare($sql);
-			$result="OK";
 			$nRegistros=0;
 			
 			$valores ="CADENA INTERNA: ";
-
 			error_reporting(E_ALL ^ E_NOTICE);
 			
-			//foreach ($Reader as $Row){
-			
-			foreach( $xlsx->rows() as $row ) {
-				
+			foreach( $xlsx->rows() as $row ) {				
 				$sector = $row[0];
 				$subsector =  "" . $row[1];
 				$unidad =  "" . $row[2];
