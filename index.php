@@ -913,7 +913,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		$cuenta = $_SESSION["idCuentaActual"];
 
 		$request=$app->request;
-
+		/*
 		$programa = $request->post('txtPrograma');
 		$auditoria = $request->post('txtTipoAuditoria');
 		$criterio = $request->post('txtCriterio');
@@ -922,15 +922,17 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		$oper = $request->post('txtOperacion');
  
  		echo nl2br("\nEl valor de Oper es: ".$oper);
+ 		*/
 		echo nl2br("\nValor usrActual:".$usrActual);
 		echo nl2br("\nValor cuenta: ".$cuenta);
+		/*
 		echo nl2br("\nValor programa: ".$programa);
 		echo nl2br("\nValor Auditoria: ".$Auditoria);
 		echo nl2br("\nValor criterio: ".$criterio);
 		echo nl2br("\nValor justificacion: ".$justificacion);
 		echo nl2br("\nValor elementos: ".$elementos);
 		//echo nl2br("\nValor estatus: ".$estatus);
-  
+  		*/
   		/*	
 		try
 		{
