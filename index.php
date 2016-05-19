@@ -597,7 +597,7 @@ $app->post('/guardar/papel', function()  use($app, $db) {
  				"FROM sia_auditores au LEFT JOIN sia_plazas p on au.idPlaza = p.idPlaza where au.idArea='DGACFA'";
  			$dbQuery = $db->prepare($sql);
  			$dbQuery->execute(array(':id' => $id));
- 			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+ 			$result ['datos']= $dbQuery->fetch(PDO::FETCH_ASSOC);
  			if(!$result){
  				$app->halt(404, "NO SE ENCONTRARON DATOS ");
  			}else{
