@@ -920,26 +920,27 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		$justificacion = strtoupper($request->post('txtJustificacionCriterio'));
 		$elementos = strtoupper($request->post('txtElementosCriterio'));
 		$oper = $request->post('txtOperacion');
-        ///*
-		echo nl2br("\nEl valor de Oper es: ".$oper);
-		echo nl2br("\nValor usrActual ".$usrActual);
-		echo nl2br("\nValor cuenta ".$cuenta);
-		echo nl2br("\nValor programa ".$programa);
-		echo nl2br("\nValor Auditoria ".$Auditoria);
-		echo nl2br("\nValor criterio ".$criterio);
-		echo nl2br("\nValor justificacion ".$justificacion);
-		echo nl2br("\nValor elementos ".$elementos);
-		echo nl2br("\nValor estatus ".$estatus);
-        //*/
+ 
+ 		echo nl2br("\nEl valor de Oper es: ".$oper);
+		echo nl2br("\nValor usrActual:".$usrActual);
+		echo nl2br("\nValor cuenta: ".$cuenta);
+		echo nl2br("\nValor programa: ".$programa);
+		echo nl2br("\nValor Auditoria: ".$Auditoria);
+		echo nl2br("\nValor criterio: ".$criterio);
+		echo nl2br("\nValor justificacion: ".$justificacion);
+		echo nl2br("\nValor elementos: ".$elementos);
+		//echo nl2br("\nValor estatus: ".$estatus);
+  
 		try
 		{
 			if($oper=='INS')
 			{
-				$sql="INSERT INTO sia_auditoriascriterios (idCuenta, idPrograma, idAuditoria, idCriterio, justificacion, elementos, usrAlta, fAlta, estatus) " .
+				$sql="INSERT INTO sia_auditoriascriterios ". 
+				"(idCuenta, idPrograma, idAuditoria, idCriterio, justificacion, elementos, usrAlta, fAlta, estatus) " .
 				"VALUES(:cuenta, :programa, :auditoria, :criterio, :justificacion, :elementos, :usrActual, getdate(), 'ACTIVO');";
 				$dbQuery = $db->prepare($sql);
 
-				$dbQuery->execute(array(':cuenta' => $cuenta, ':programa:' => $programa, ':auditoria' => $auditoria, ':criterio' => $criterio, ':justificacion' => $justificacion, ':elementos' => $elementos, ':usrActual' => $usrActual ));
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':programa:' => $programa, ':auditoria' => $auditoria, ':criterio' => $criterio, ':Justificacion' => $justificacion, ':elementos' => $elementos, ':usrActual' => $usrActual ));
 			}else{
 
 				$sql="UPDATE sia_auditoriascriterios SET " . 
@@ -949,7 +950,6 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 				$dbQuery = $db->prepare($sql);
 
 				$dbQuery->execute(array(':criterio' => $criterio, ':justificacion' => $justificacion, ':elementos' => $elementos, ':usrActual' => $usrActual,':cuenta' => $cuenta, ':programa:' => $programa, ':auditoria' => $auditoria ));
-
 			}
 
 			echo nl2br("\nQuery Ejecutado : ".$sql);
