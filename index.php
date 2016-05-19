@@ -359,99 +359,12 @@
 		}
 
 	});
-	
-	$app->get('/cargarArchivo/Universo/:nombre/:cuenta', function($nombre, $cuenta)    use($app, $db) {	
-		try{
-			$usrActual = $_SESSION["idUsuario"];
-			$archivo ='uploads/' . $nombre;
 
-			//Elimina cuenta pública
-			$sql="DELETE FROM sia_cuentasingresos WHERE idCuenta= :cuenta ;";
-			$dbQuery = $db->prepare($sql);
-			$dbQuery->execute(array(':cuenta' => $cuenta));
 
-			//Abrir archivo de XLS
-			$xlsx = new SimpleXLSX($archivo);
-			list($num_cols, $num_rows) = $xlsx->dimension();			
 
-			//insertar 
-			$sql="INSERT INTO sia_cuentasuniversos (idCuenta, origen, tipo, clave, nivel, nombre,  original, recaudado, usrAlta, fAlta, estatus) " .
-			"values(:cuenta,:origen, :tipo, :clave, :nivel, :nombre, :original, :recaudado, :usrActual, getdate(), 'ACTIVO')";
-
-			$dbQuery = $db->prepare($sql);
-			$nRegistros=0;
-			
-			error_reporting(E_ALL ^ E_NOTICE);
-			
-			foreach( $xlsx->rows() as $row ) {				
-				$origen = $row[0];
-				$tipo =  "" . $row[1];
-				$clave =  "" . $row[2];
-				$nivel =  "" . $row[3];
-				$nombre =  "" . $row[4];
-				$original =  "" . $row[5];
-				$recaudado =  "" . $row[6];
-								
-				if ($nRegistros>0){
-					//$dbQuery->execute(array(':cuenta' => $cuenta, ':origen' => $origen, ':tipo' => $tipo,':clave' => $clave, ':nivel' => $nivel, ':nombre' => $nombre, 
-					//':original' => $original, ':recaudado' => $recaudado,':usrActual' => $usrActual));								
-				}				
-				$nRegistros++;	
-			}
-			echo "Se cargaron " . $nRegistros . " registro(s).";
-		}catch (PDOException $e) {
-			echo  "<br>¡Error en el TRY!: " . $e->getMessage();
-			die();
-		}
-	});	
+	$app->get('/cargarArchivo/Egreso/:nombre/:cuenta', function($nombre, $cuenta)    use($app, $db) {
 
 	
-	$app->get('/cargarArchivo/Ingreso/:nombre/:cuenta', function($nombre, $cuenta)    use($app, $db) {	
-		try{
-			$usrActual = $_SESSION["idUsuario"];
-			$archivo ='uploads/' . $nombre;
-
-			//Elimina cuenta pública
-			$sql="DELETE FROM sia_cuentasingresos WHERE idCuenta= :cuenta ;";
-			$dbQuery = $db->prepare($sql);
-			$dbQuery->execute(array(':cuenta' => $cuenta));
-
-			//Abrir archivo de XLS
-			$xlsx = new SimpleXLSX($archivo);
-			list($num_cols, $num_rows) = $xlsx->dimension();			
-
-			//insertar 
-			$sql="INSERT INTO sia_cuentasingresos (idCuenta, origen, tipo, clave, nivel, nombre,  original, recaudado, usrAlta, fAlta, estatus) " .
-			"values(:cuenta,:origen, :tipo, :clave, :nivel, :nombre, :original, :recaudado, :usrActual, getdate(), 'ACTIVO')";
-
-			$dbQuery = $db->prepare($sql);
-			$nRegistros=0;
-			
-			error_reporting(E_ALL ^ E_NOTICE);
-			
-			foreach( $xlsx->rows() as $row ) {				
-				$origen = $row[0];
-				$tipo =  "" . $row[1];
-				$clave =  "" . $row[2];
-				$nivel =  "" . $row[3];
-				$nombre =  "" . $row[4];
-				$original =  "" . $row[5];
-				$recaudado =  "" . $row[6];
-								
-				if ($nRegistros>0){
-					$dbQuery->execute(array(':cuenta' => $cuenta, ':origen' => $origen, ':tipo' => $tipo,':clave' => $clave, ':nivel' => $nivel, ':nombre' => $nombre, 
-					':original' => $original, ':recaudado' => $recaudado,':usrActual' => $usrActual));								
-				}				
-				$nRegistros++;	
-			}
-			echo "Se cargaron " . $nRegistros . " registro(s).";
-		}catch (PDOException $e) {
-			echo  "<br>¡Error en el TRY!: " . $e->getMessage();
-			die();
-		}
-	});
-
-	$app->get('/cargarArchivo/Egreso/:nombre/:cuenta', function($nombre, $cuenta)    use($app, $db) {	
 		try{
 			$usrActual = $_SESSION["idUsuario"];
 			$archivo ='uploads/' . $nombre;
@@ -475,6 +388,7 @@
 			$dbQuery = $db->prepare($sql);
 			$nRegistros=0;
 			
+			//$valores ="CADENA INTERNA: ";
 			error_reporting(E_ALL ^ E_NOTICE);
 			
 			foreach( $xlsx->rows() as $row ) {				
@@ -506,15 +420,30 @@
 					$dbQuery->execute(array(':cuenta' => $cuenta, ':sector' => $sector, ':subsector' => $subsector,':unidad' => $unidad, ':funcion' => $funcion, ':subfuncion' => $subfuncion, ':actividad' => $actividad,
 					':capitulo' => $capitulo, ':partida' => $partida, ':finalidad' => $finalidad, ':progPres' => $progPres, ':fuenteFinanciamiento' => $fuenteFinanciamiento, ':fuenteGenerica' => $fuenteGenerica,
 					':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
-					':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));								
-				}				
+					':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));				
+					
+					//$valores = $valores . "\n Registro #" . $nRegistros . " | "  . $row[0] . " | "  . $row[1] . " | "  . $row[2] . " | "  . $row[3] . " | "  . $row[4] . " | "  . $row[5] . " | "  . $row[6] . " | "  . $row[7];
+					//$valores = $valores . " | "  . $row[8] . " | "  . $row[9] . " | "  . $row[10] . " | "  . $row[11] . " | "  . $row[12] . " | "  . $row[13] . " | "  . $row[14] . " | "  . $row[15] . " | "  . $row[16] . " | "  . $row[17];
+					//$valores = $valores . " | "  . $row[18] . " | "  . $row[19] . " | "  . $row[20] . " | "  . $row[21] . " | "  . $row[22];									
+				}
+				
 				$nRegistros++;	
+				
+				
+				//if ($nRegistros==5) break;
 			}
+			//echo $valores;
+			
 			echo "Se cargaron " . $nRegistros . " registro(s).";
+
 		}catch (PDOException $e) {
 			echo  "<br>¡Error en el TRY!: " . $e->getMessage();
-			die();
+			//die();
 		}
+			
+			
+			
+
 	});
 
 
@@ -523,7 +452,7 @@
 
 
 	//Guarda un papel
-	$app->post('/guardar/papel', function()  use($app, $db) {
+$app->post('/guardar/papel', function()  use($app, $db) {
 		$usrActual = $_SESSION["idUsuario"];
 
 		$request=$app->request;
@@ -629,37 +558,52 @@
 		INICIA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
 	*/
-		$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
-			$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
-			"FROM sia_diasinhabiles WHERE idDia=:id ";
-			$dbQuery = $db->prepare($sql);
-			$dbQuery->execute(array(':id' => $id));
-			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
-			if(!$result){
-				$app->halt(404, "NO SE ENCONTRARON DATOS ");
-			}else{
-				echo json_encode($result);
-			}
-		});
+	// Obten los registro que cumplan con el día inhábil
+	$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
+		$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
+		"FROM sia_diasinhabiles WHERE idDia=:id ";
+		$dbQuery = $db->prepare($sql);
+		$dbQuery->execute(array(':id' => $id));
+		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+		if(!$result){
+			$app->halt(404, "NO SE ENCONTRARON DATOS ");
+		}else{
+			echo json_encode($result);
+		}
+	});
+
+	// Obten los registro que cumplan con el tipo de auditoría enviado
+	$app->get('/lstCriteriosByTipoAuditoria/:id', function($id)  use($app, $db) {
+
+		$sql="SELECT idCriterio id, nombre texto FROM sia_criterios Where idTipoAuditoria=:id";
+
+		$dbQuery = $db->prepare($sql);
+		$dbQuery->execute(array(':id' => $id));
+		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
+		if(!$result){
+			$app->halt(404, "NO SE ENCONTRARON CRITERIOS PARA MOSTRAR. ");
+		}else{
+			echo json_encode($result);
+		}
+	});
+
 	/* **********************************************************************************
 		FINALIZA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
 	*/
-
-
-		//lista de auditores
-  		$app->get('/lstAuditoresByID/:id', function($id)    use($app, $db) {
-  			$sql="SELECT idEmpleado iDia, CONCAT(au.nombre,' ',au.paterno,' ',au.materno) nombre, p.nombre puesto " .
-  				"FROM sia_auditores au LEFT JOIN sia_plazas p on au.idPlaza = p.idPlaza where au.idArea='DGACFA'";
-  			$dbQuery = $db->prepare($sql);
-  			$dbQuery->execute(array(':id' => $id));
-  			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
-  			if(!$result){
-  				$app->halt(404, "NO SE ENCONTRARON DATOS ");
-  			}else{
-  				echo json_encode($result);
-  			}
-  		});
+//lista de auditores
+ 		$app->get('/lstAuditoresByID/:id', function($id)    use($app, $db) {
+ 			$sql="SELECT idEmpleado iDia, CONCAT(au.nombre,' ',au.paterno,' ',au.materno) nombre, p.nombre puesto " .
+ 				"FROM sia_auditores au LEFT JOIN sia_plazas p on au.idPlaza = p.idPlaza where au.idArea='DGACFA'";
+ 			$dbQuery = $db->prepare($sql);
+ 			$dbQuery->execute(array(':id' => $id));
+ 			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+ 			if(!$result){
+ 				$app->halt(404, "NO SE ENCONTRARON DATOS ");
+ 			}else{
+ 				echo json_encode($result);
+ 			}
+ 		});
 
 	//Guarda un avanceActividad
 $app->post('/guardar/avance', function()  use($app, $db) {
@@ -893,8 +837,10 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 	});
 
 
-	// Inicio nuevo Código HVS 20160512 09:30
-		//CODIGO PHP
+	/* **********************************************************************************
+		INICIA CODIGO HVS 
+	 ***********************************************************************************
+	*/
 		//Guarda un día inhábil
 	$app->post('/guardar/inhabiles', function()  use($app, $db) {
 		$usrActual = $_SESSION["idUsuario"];
@@ -952,7 +898,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 			}
 
-			echo nl2br("\nQuery Ejecutado : ".$sql);
+			//echo nl2br("\nQuery Ejecutado : ".$sql);
 
 		}catch (Exception $e) {
 			print "¡Error!: " . $e->getMessage() . "<br/>";
@@ -961,7 +907,66 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		$app->redirect($app->urlFor('listaInhabiles'));
 	});
 
-	// Fin Nuevo Código HVS 20160512 09:30
+	//Guarda un nuevo criterio para la auditoria
+	$app->post('/guardar/auditoriaCriterios', function()  use($app, $db) {
+		$usrActual = $_SESSION["idUsuario"];
+		$cuenta = $_SESSION["idCuentaActual"];
+
+		$request=$app->request;
+
+		$programa = $request->post('txtPrograma');
+		$auditoria = $request->post('txtTipoAuditoria');
+		$criterio = $request->post('txtCriterio');
+		$justificacion = strtoupper($request->post('txtJustificacionCriterio'));
+		$elementos = strtoupper($request->post('txtElementosCriterio'));
+		$oper = $request->post('txtOperacion');
+        ///*
+		echo nl2br("\nEl valor de Oper es: ".$oper);
+		echo nl2br("\nValor usrActual ".$usrActual);
+		echo nl2br("\nValor cuenta ".$cuenta);
+		echo nl2br("\nValor programa ".$programa);
+		echo nl2br("\nValor Auditoria ".$Auditoria);
+		echo nl2br("\nValor criterio ".$criterio);
+		echo nl2br("\nValor justificacion ".$justificacion);
+		echo nl2br("\nValor elementos ".$elementos);
+		echo nl2br("\nValor estatus ".$estatus);
+        //*/
+		try
+		{
+			if($oper=='INS')
+			{
+				$sql="INSERT INTO sia_auditoriascriterios (idCuenta, idPrograma, idAuditoria, idCriterio, justificacion, elementos, usrAlta, fAlta, estatus) " .
+				"VALUES(:cuenta, :programa, :auditoria, :criterio, :justificacion, :elementos, :usrActual, getdate(), 'ACTIVO');";
+				$dbQuery = $db->prepare($sql);
+
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':programa:' => $programa, ':auditoria' => $auditoria, ':criterio' => $criterio, ':justificacion' => $justificacion, ':elementos' => $elementos, ':usrActual' => $usrActual ));
+			}else{
+
+				$sql="UPDATE sia_auditoriascriterios SET " . 
+				"idCriterio=:criterio, justificacion=:justificacion, elementos=:elementos, " . 
+				"usrModificacion=:usrActual, fModificacion=getdate() " . 
+				"WHERE idCuenta=:cuenta and idPrograma=:programa and idAuditoria=:auditoria ";
+				$dbQuery = $db->prepare($sql);
+
+				$dbQuery->execute(array(':criterio' => $criterio, ':justificacion' => $justificacion, ':elementos' => $elementos, ':usrActual' => $usrActual,':cuenta' => $cuenta, ':programa:' => $programa, ':auditoria' => $auditoria ));
+
+			}
+
+			echo nl2br("\nQuery Ejecutado : ".$sql);
+
+		}catch (Exception $e) {
+			print "¡Error!: " . $e->getMessage() . "<br/>";
+			die();
+		}
+		//$app->redirect($app->urlFor('listaAuditoriaCriterios'));
+	});
+
+
+	/* **********************************************************************************
+		FINALIZA CODIGO HVS 
+	 ***********************************************************************************
+	*/
+
 
 
 
