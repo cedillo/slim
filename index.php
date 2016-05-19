@@ -2,15 +2,21 @@
 	session_start();
 	require 'src/conexion.php';
 	require 'Slim/Slim.php';
-	require 'hector.php';
-	require 'arian.php';
-	require 'cota.php';
+
 	
 	include 'Excel/simplexlsx.class.php';
 
 
 	\Slim\Slim::registerAutoloader();
 	$app = new \Slim\Slim();
+	
+	$db="";
+	
+	require 'hector.php';
+	require 'arian.php';
+	require 'cota.php';	
+	
+	
 
 	define("MAIN_ACCESS", true);
 
@@ -23,6 +29,9 @@
 		die();
 	}
 	if(!isset($_SESSION["logueado"])) $_SESSION["logueado"]=0;
+	
+	
+	
 
 	//ACCESO AL SISTEMA
 
