@@ -587,19 +587,6 @@ $app->post('/guardar/papel', function()  use($app, $db) {
 		}
 	});
 
-	$app->get('/lstInhabilByID/:id', function($id)    use($app, $db) {
-		$sql="SELECT idCuenta idDia, tipo, nombre, fInicio, fFin, usrAlta, fAlta, estatus " .
-		"FROM sia_diasinhabiles WHERE idDia=:id ";
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':id' => $id));
-		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS ");
-		}else{
-			echo json_encode($result);
-		}
-	});
-
 	/* **********************************************************************************
 		FINALIZA CODIGO HVS 2016/05/17
 	 ***********************************************************************************
@@ -850,8 +837,10 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 	});
 
 
-	// Inicio nuevo Código HVS 20160512 09:30
-		//CODIGO PHP
+	/* **********************************************************************************
+		INICIA CODIGO HVS 
+	 ***********************************************************************************
+	*/
 		//Guarda un día inhábil
 	$app->post('/guardar/inhabiles', function()  use($app, $db) {
 		$usrActual = $_SESSION["idUsuario"];
@@ -909,7 +898,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 			}
 
-			echo nl2br("\nQuery Ejecutado : ".$sql);
+			//echo nl2br("\nQuery Ejecutado : ".$sql);
 
 		}catch (Exception $e) {
 			print "¡Error!: " . $e->getMessage() . "<br/>";
@@ -918,7 +907,66 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		$app->redirect($app->urlFor('listaInhabiles'));
 	});
 
-	// Fin Nuevo Código HVS 20160512 09:30
+	//Guarda un nuevo criterio para la auditoria
+	$app->post('/guardar/auditoriaCriterios', function()  use($app, $db) {
+		$usrActual = $_SESSION["idUsuario"];
+		$cuenta = $_SESSION["idCuentaActual"];
+
+		$request=$app->request;
+
+		$programa = $request->post('txtPrograma');
+		$auditoria = $request->post('txtTipoAuditoria');
+		$criterio = $request->post('txtCriterio');
+		$justificacion = strtoupper($request->post('txtJustificacionCriterio'));
+		$elementos = strtoupper($request->post('txtElementosCriterio'));
+		$oper = $request->post('txtOperacion');
+        ///*
+		echo nl2br("\nEl valor de Oper es: ".$oper);
+		echo nl2br("\nValor usrActual ".$usrActual);
+		echo nl2br("\nValor cuenta ".$cuenta);
+		echo nl2br("\nValor programa ".$programa);
+		echo nl2br("\nValor Auditoria ".$Auditoria);
+		echo nl2br("\nValor criterio ".$criterio);
+		echo nl2br("\nValor justificacion ".$justificacion);
+		echo nl2br("\nValor elementos ".$elementos);
+		echo nl2br("\nValor estatus ".$estatus);
+        //*/
+		try
+		{
+			if($oper=='INS')
+			{
+				$sql="INSERT INTO sia_auditoriascriterios (idCuenta, idPrograma, idAuditoria, idCriterio, justificacion, elementos, usrAlta, fAlta, estatus) " .
+				"VALUES(:cuenta, :programa, :auditoria, :criterio, :justificacion, :elementos, :usrActual, getdate(), 'ACTIVO');";
+				$dbQuery = $db->prepare($sql);
+
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':programa:' => $programa, ':auditoria' => $auditoria, ':criterio' => $criterio, ':justificacion' => $justificacion, ':elementos' => $elementos, ':usrActual' => $usrActual ));
+			}else{
+
+				$sql="UPDATE sia_auditoriascriterios SET " . 
+				"idCriterio=:criterio, justificacion=:justificacion, elementos=:elementos, " . 
+				"usrModificacion=:usrActual, fModificacion=getdate() " . 
+				"WHERE idCuenta=:cuenta and idPrograma=:programa and idAuditoria=:auditoria ";
+				$dbQuery = $db->prepare($sql);
+
+				$dbQuery->execute(array(':criterio' => $criterio, ':justificacion' => $justificacion, ':elementos' => $elementos, ':usrActual' => $usrActual,':cuenta' => $cuenta, ':programa:' => $programa, ':auditoria' => $auditoria ));
+
+			}
+
+			echo nl2br("\nQuery Ejecutado : ".$sql);
+
+		}catch (Exception $e) {
+			print "¡Error!: " . $e->getMessage() . "<br/>";
+			die();
+		}
+		//$app->redirect($app->urlFor('listaAuditoriaCriterios'));
+	});
+
+
+	/* **********************************************************************************
+		FINALIZA CODIGO HVS 
+	 ***********************************************************************************
+	*/
+
 
 
 
