@@ -2,8 +2,6 @@
 	session_start();
 	require 'src/conexion.php';
 	require 'Slim/Slim.php';
-
-	
 	include 'Excel/simplexlsx.class.php';
 
 
@@ -13,7 +11,7 @@
 	$db="";
 	
 	require 'hector.php';
-	require 'arian.php';
+	//require 'arian.php';
 	require 'cota.php';	
 	
 	
