@@ -646,6 +646,21 @@
 	 ***********************************************************************************
 	*/
 
+
+		//lista de auditores
+  		$app->get('/lstAuditoresByID/:id', function($id)    use($app, $db) {
+  			$sql="SELECT idEmpleado iDia, CONCAT(au.nombre,' ',au.paterno,' ',au.materno) nombre, p.nombre puesto " .
+  				"FROM sia_auditores au LEFT JOIN sia_plazas p on au.idPlaza = p.idPlaza where au.idArea='DGACFA'";
+  			$dbQuery = $db->prepare($sql);
+  			$dbQuery->execute(array(':id' => $id));
+  			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+  			if(!$result){
+  				$app->halt(404, "NO SE ENCONTRARON DATOS ");
+  			}else{
+  				echo json_encode($result);
+  			}
+  		});
+
 	//Guarda un avanceActividad
 $app->post('/guardar/avance', function()  use($app, $db) {
 		$usrActual = $_SESSION["idUsuario"];
