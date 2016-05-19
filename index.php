@@ -438,20 +438,19 @@
 					':fuenteEspecifica' => $fuenteEspecifica, ':origenRecurso' => $origenRecurso, ':tipoGasto' => $tipoGasto, ':digito' => $digito, ':proyecto' => $proyecto, ':destinoGasto' => $destinoGasto,
 					':original' => $original, ':modificado' => $modificado, ':ejercido' => $ejercido, ':pagado' => $pagado, ':pendiente' => $pendiente, ':usrActual' => $usrActual));				
 					
-					$valores = $valores . "\n Registro #" . $nRegistros . " "  . $row[0] . " "  . $row[1] . " "  . $row[2] . " "  . $row[3] . " "  . $row[4] . " "  . $row[5] . " "  . $row[6] . " "  . $row[7];
-					$valores = $valores . " "  . $row[8] . " "  . $row[9] . " "  . $row[10] . " "  . $row[11] . " "  . $row[12] . " "  . $row[13] . " "  . $row[14] . " "  . $row[15] . " "  . $row[16] . " "  . $row[17];
-					$valores = $valores . " "  . $row[18] . " "  . $row[19] . " "  . $row[20] . " "  . $row[21] . " "  . $row[22];				
-					
+					$valores = $valores . "\n Registro #" . $nRegistros . " | "  . $row[0] . " | "  . $row[1] . " | "  . $row[2] . " | "  . $row[3] . " | "  . $row[4] . " | "  . $row[5] . " | "  . $row[6] . " | "  . $row[7];
+					$valores = $valores . " | "  . $row[8] . " | "  . $row[9] . " | "  . $row[10] . " | "  . $row[11] . " | "  . $row[12] . " | "  . $row[13] . " | "  . $row[14] . " | "  . $row[15] . " | "  . $row[16] . " | "  . $row[17];
+					$valores = $valores . " | "  . $row[18] . " | "  . $row[19] . " | "  . $row[20] . " | "  . $row[21] . " | "  . $row[22];									
 				}
 				
 				$nRegistros++;	
 				
 				
-				if ($nRegistros==20) break;
+				if ($nRegistros==5) break;
 			}
 			echo $valores;
 
-		}catch (Exception $e) {
+		}catch (PDOException $e) {
 			echo  "<br>¡Error en el TRY!: " . $e->getMessage();
 			//die();
 		}
