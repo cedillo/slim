@@ -1,0 +1,98 @@
+-- phpMyAdmin SQL Dump
+-- version 4.5.1
+-- http://www.phpmyadmin.net
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 04-04-2016 a las 17:49:29
+-- Versión del servidor: 10.1.10-MariaDB
+-- Versión de PHP: 5.5.30
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `ascm_sia`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `sia_usuarios`
+--
+
+CREATE TABLE `sia_usuarios` (
+  `idUsuario` int(11) NOT NULL,
+  `nombre` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
+  `paterno` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
+  `materno` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
+  `telefono` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
+  `usuario` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
+  `pwd` varchar(30) COLLATE utf8_spanish_ci NOT NULL,
+  `estatus` varchar(30) COLLATE utf8_spanish_ci NOT NULL DEFAULT 'ACTIVO'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+--
+-- Volcado de datos para la tabla `sia_usuarios`
+--
+
+INSERT INTO `sia_usuarios` (`idUsuario`, `nombre`, `paterno`, `materno`, `telefono`, `usuario`, `pwd`, `estatus`) VALUES
+(1, 'CARLOS AUGUSTO', 'MORALES', 'LÓPEZ', '5526360659 ', 'carlosaugusto-morales@hotmail.com', '45674531', 'ACTIVO'),
+(2, 'CARLOS D.', 'PLASCENCIA', '', '5518280425 ', 'cdps@live.com.mx', '12566523', 'ACTIVO'),
+(3, 'JESICA', 'MIRANDA', '', '5545304470 ', 'miranda.jesika@gmail.com', '45342198', 'ACTIVO'),
+(4, 'MARIA DE JESUS', 'JUÁREZ', '', '5538876246 ', 'coordinacion.iztapalapa1518@gmail.com', '56764387', 'ACTIVO'),
+(5, 'SHAULA', 'OLEA', '', '5510911182 ', 'somosmas1518@gmail.com', '67545698', 'ACTIVO'),
+(6, 'CAPTURISTA 1', '', '', '5510101011', 'correo1@agendasd.com.mx', '54567689', 'ACTIVO'),
+(7, 'CAPTURISTA 2', '', '', '5510101012', 'correo2@agendasd.com.mx', '12436709', 'ACTIVO'),
+(8, 'CAPTURISTA 3', '', '', '5510101013', 'correo3@agendasd.com.mx', '98457622', 'ACTIVO'),
+(9, 'CAPTURISTA 4', '', '', '5510101014', 'correo4@agendasd.com.mx', '56334469', 'ACTIVO'),
+(10, 'CAPTURISTA 5', '', '', '5510101015', 'correo5@agendasd.com.mx', '33674351', 'ACTIVO'),
+(11, 'CAPTURISTA 6', '', '', '5510101016', 'correo6@agendasd.com.mx', '98675432', 'ACTIVO'),
+(12, 'CAPTURISTA 7', '', '', '5510101017', 'correo7@agendasd.com.mx', '87656753', 'ACTIVO'),
+(13, 'CAPTURISTA 8', '', '', '5510101018', 'correo8@agendasd.com.mx', '90986711', 'ACTIVO'),
+(14, 'ROBERTO', 'CRUZ', '', '5534746963', 'distritoxix.cruz@hotmail.com', '10515568', 'ACTIVO'),
+(15, 'RAQUEL', 'RANGEL', '', '5562067784', 'distritoxix.cruz@hotmail.com', '43288431', 'ACTIVO'),
+(16, 'MIGUEL', 'MORALES', '', '5539686613', 'miguelangel.ml@hotmail.com', '62508949', 'ACTIVO'),
+(17, 'IVÁN', 'REBOLLAR', '', '5522708296', 'ivan.dtto24@hotmail.com', '59470683', 'ACTIVO'),
+(18, 'GUADALUPE', 'MARTINEZ', '', '5535098340', 'elenacruzyescas@yahoo.com.mx', '21620296', 'ACTIVO'),
+(19, 'CRISTIAN', 'OLVERA', '', '5540259889', 'crisolvazq@gmail.com', '32889529', 'ACTIVO'),
+(20, 'MARIA ELENA', 'CRUZ', '', '5541332332', 'elenacruzyescas@yahoo.com.mx', '76925274', 'ACTIVO'),
+(21, 'MA. DE LOS ANGELES', 'LÓPEZ', '', '5510694118', 'mariadeangeleslopez@gmail.com', '38210223', 'ACTIVO'),
+(22, 'MARGARITA', 'VILLALOBOS', '', '123', 'demo2', '123', 'ACTIVO'),
+(23, 'DAVID', 'CEDILLO', '', '5528117259', 'rayi-monis@hotmail.com', '26536736', 'ACTIVO'),
+(24, 'EDITH', 'ALZATE', '', '5528646599', 'rayi-monis@hotmail.com', '85743410', 'ACTIVO'),
+(25, 'EVELIA', 'TOVAR', '', '5541935303', 'evelia.tovar24@gmail.com', '79131081', 'ACTIVO'),
+(26, 'ROBERTO', 'CASSO', '', '5535098340', 'r2009cr@prodigy.net.mx', '14144738', 'ACTIVO'),
+(27, 'JOSÉ', 'GONZÁLEZ', '', '5538799479', 'correo.temporal@hotmail.com', '3712719', 'ACTIVO'),
+(28, 'MARTHA', 'MEDINA', '', '5516821033', 'memedinar@hotmail.com', '92013568', 'ACTIVO'),
+(29, 'MARIA ANTONIETA', 'MOLINA (MARA)', '', '5518185962', 'maraamolina26@gmail.com', '62925050', 'ACTIVO'),
+(30, 'JORGE', 'RENDÓN', '', '5516276935', 'danielaop77@gmail.com', '14298280', 'ACTIVO'),
+(42, 'JOSE AURELIO', 'COTA', 'ZAZUETA', '5536664613', 'ja_cota@hotmail.com', '123', 'ACTIVO');
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `sia_usuarios`
+--
+ALTER TABLE `sia_usuarios`
+  ADD PRIMARY KEY (`idUsuario`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `sia_usuarios`
+--
+ALTER TABLE `sia_usuarios`
+  MODIFY `idUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

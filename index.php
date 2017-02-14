@@ -2,18 +2,17 @@
 	session_start();
 	require 'src/conexion.php';
 	require 'Slim/Slim.php';
+	
 	include 'Excel/simplexlsx.class.php';
 
 
 	\Slim\Slim::registerAutoloader();
 	$app = new \Slim\Slim();
-	
-	$db="";
-	
+
 	require 'hector.php';
-	//require 'arian.php';
-	require 'cota.php';	
-	
+	require 'arian.php';
+	require 'cota.php';
+	require 'carlos.php';
 	
 
 	define("MAIN_ACCESS", true);
@@ -27,9 +26,6 @@
 		die();
 	}
 	if(!isset($_SESSION["logueado"])) $_SESSION["logueado"]=0;
-	
-	
-	
 
 	//ACCESO AL SISTEMA
 
@@ -37,7 +33,8 @@
 	$app->get('/', function() use($app){
 		if($_SESSION["logueado"]==1){
 			$result= array('idUsuario' => $_SESSION["idUsuario"] , 'nombre' => $_SESSION["sUsuario"] );
-			$app->render('dashboard.php', $result);
+			$app->redirect($app->urlFor('listaDashboard'));
+			
 		}else{
 			$app->render('login.html');
 		}
@@ -52,10 +49,10 @@
 		$longitud = $request->post('txtLongitud');
 
 		
-		$sql = "SELECT u.idUsuario, u.idEmpleado, CONCAT(u.nombre, ' ', u.paterno, ' ', u.materno) nombre, e.idArea, p.nombre sPlaza " .
+		$sql = "SELECT u.idUsuario, u.idEmpleado, CONCAT(u.nombre, ' ', u.paterno, ' ', u.materno) nombre, COALESCE(u.idArea, e.idArea) idArea, p.nombre sPlaza " .
 		"FROM sia_usuarios u " .
-		"inner join sia_empleados e on u.idEmpleado=e.idEmpleado " . 
-		"inner join sia_plazas p on e.idArea = p.idArea and e.idNivel = p.idNivel and e.idNombramiento = p.idNombramiento and e.idPuesto = p.idPuesto and e.idPlaza = p.idPlaza " .
+		"left join sia_empleados e on u.idEmpleado=e.idEmpleado " . 
+		"left join sia_plazas p on e.idArea = p.idArea and e.idNivel = p.idNivel and e.idNombramiento = p.idNombramiento and e.idPuesto = p.idPuesto and e.idPlaza = p.idPlaza " .
 		" WHERE usuario=:cuenta and pwd=:pass";
 		
 		
@@ -64,6 +61,9 @@
 		
 		$dbQuery->execute(array(':cuenta' => $cuenta, ':pass' => $pass));
 		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+		
+		$_SESSION["usrGlobal"]="NO";
+		$_SESSION["usrGlobalArea"]="NO";
 		if($result){
 
 		$_SESSION["logueado"] =1;
@@ -109,6 +109,7 @@
 		if($result){
 			$_SESSION["sCuentaActual"] 		=$result['nombre'];
 			$_SESSION["idCuentaActual"] 	=$result['id'];
+			$_SESSION["idCuentaVariable"] 	=$result['id'];
 			$tmpCta=$result['id'];
 
 			//Obtener el PGA actual
@@ -117,171 +118,124 @@
 			$dbQuery->execute(array(':cta'=> $tmpCta ));
 			$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
 			$_SESSION["idProgramaActual"] 	=$result['idPrograma'];
+			
+			
+				//Determinar si es rol global
+				$sql = 	"SELECT count(*) nRegistros  FROM sia_usuariosroles WHERE idUsuario=:usr and idRol='GLOBAL'";
+				$dbQuery = $db->prepare($sql);
+				$dbQuery->execute(array(':usr'=> $usrActual ));
+				$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+				if($result['nRegistros']>0)$_SESSION["usrGlobal"]="SI";		
+				
+				//Determinar si es rol global
+				$sql = 	"SELECT count(*) nRegistros  FROM sia_usuariosroles WHERE idUsuario=:usr and idRol='GLOBAL-AREA'";
+				$dbQuery = $db->prepare($sql);
+				$dbQuery->execute(array(':usr'=> $usrActual ));
+				$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
+				if($result['nRegistros']>0)$_SESSION["usrGlobalArea"]="SI";		
 
 
+				
 		}else{
 			$_SESSION["sCuentaActual"] 		="";
 			$_SESSION["idCuentaActual"] 	="";
 			$_SESSION["idProgramaActual"] 	="***";
+			$_SESSION["idCuentaVariable"] = "";
 
 		}
-		$app->render('dashboard.php');
+		$app->redirect($app->urlFor('listaDashboard'));
+		
+		
 		}else{
-			$app->halt(404, "Usuario: " . $cuenta . " Pass: " . $pass . "<br>USUARIO NO ENCONTRADO.");
+			//$app->halt(404, "Usuario: " . $cuenta . " Pass: " . $pass . "<br>USUARIO NO ENCONTRADO.");
 			$_SESSION["logueado"] =0;
-			$app->render('login.html');
+			//$app->render('login.html');
+			$app->render('temporal.html');
+			
+			
 		}
 	});
 
 	$app->get('/cerrar', function() use($app, $db){
-
+		if(!isset($_SESSION["idUsuario"])){
 			$sql="UPDATE sia_accesos SET fEgreso=getdate(), estatus='INACTIVO' WHERE idUsuario=:usrActual AND estatus='ACTIVO';";
 			$dbQuery = $db->prepare($sql);
 			$dbQuery->execute(array(':usrActual'=>$_SESSION["idUsuario"]));
-
-
-		//unset($_SESSION["idUsuario"]);
-		//unset($_SESSION["sUsuario"]);
-		session_destroy();
+			session_destroy();		
+		}
 		$app->render('login.html');
 	});
+	
 
-
-	$app->get('/dashboard', function()  use ($app) {
-		$app->render('dashboard.php');
-	});
-
-
-
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-
-	$app->get('/acopio', function() use($app, $db){
+	$app->get('/dashboard', function()  use($app, $db) {
 		$cuenta = $_SESSION["idCuentaActual"];
+		$area = $_SESSION["idArea"];
+		$rpe = $_SESSION["idEmpleado"];
+		$usrActual = $_SESSION["idUsuario"];
+		$global = $_SESSION["usrGlobal"];
+		$globalArea = $_SESSION["usrGlobalArea"];
+		/*
+		$sql="SELECT idCuenta cuenta, idPrograma programa, idAuditoria auditoria,  tipoAuditoria tipo, idArea area, idSector sector, idSubsector subSector, idUnidad unidad, idObjeto objeto, objetivo, alcance, justificacion, tipoPresupuesto, acompanamiento, idProceso proceso, idEtapa etapa  FROM sia_auditorias  WHERE idAuditoria=:id ";
+		*/
+		if ($global=="SI"){
 
-		//$sql="SELECT distinct idCuenta, idPrograma FROM sia_programas WHERE idCuenta=:cuenta ";
+			$sql="SELECT a.idAuditoria auditoria, COALESCE(a.clave, convert(varchar, a.idAuditoria)) claveAuditoria, ar.nombre area, dbo.lstSujetosByAuditoria(a.idAuditoria) sujeto,  dbo.lstObjetosByAuditoria(a.idAuditoria) objeto, ta.nombre tipo, '0.00' avances " .
+			"FROM sia_programas p " .
+  			"INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+			"LEFT JOIN sia_areas ar on a.idArea=ar.idArea " .
+			"inner join sia_tiposauditoria ta on a.tipoAuditoria=ta.idTipoAuditoria " .
+			"Where a.idCuenta=:cuenta " .
 
-		$sql="SELECT ac.idCuenta, ac.idPrograma, ac.idAuditoria auditoria,  s.nombre sujeto, o.nombre objeto, ac.idAcopio id, ac.clasificacion, ac.asunto, ta.nombre tipo, " .
-		"CONVERT(VARCHAR(11),ac.fAlta,102) fecha, ac.idFase fase, ac.tipoArchivo, ac.estatus " .
-		"FROM sia_acopio ac " .
-		"LEFT JOIN sia_sujetos s on ac.idSujeto=s.idSujeto " .
-		"LEFT JOIN sia_objetos o on ac.idSujeto=o.idSujeto and ac.idObjeto=o.idObjeto " .
-		"LEFT JOIN sia_auditorias a on ac.idAuditoria=a.idAuditoria " .
-		"LEFT JOIN sia_tiposauditoria ta on a.tipoAuditoria=ta.idTipoAuditoria " .
-		"ORDER BY  ac.idAcopio DESC";
+			//Linea nueva para filtrar por rol-etapa
+			"and a.idEtapa in (Select idEtapa from sia_rolesetapas re inner join sia_usuariosroles ur on ur.idRol = re.idRol  Where ur.idUsuario=:usrActual) ".			
+			"ORDER BY  a.idAuditoria desc ";
+				
+			$dbQuery = $db->prepare($sql);
+			$dbQuery->execute(array(':cuenta' => $cuenta, ':usrActual' => $usrActual));
+			
+		}else{		
+		
+			
+			if ($globalArea=="SI"){
+			
+				$sql="SELECT a.idAuditoria auditoria, COALESCE(a.clave, convert(varchar, a.idAuditoria)) claveAuditoria, ar.nombre area, dbo.lstSujetosByAuditoria(a.idAuditoria) sujeto, dbo.lstObjetosByAuditoria(a.idAuditoria) objeto, ta.nombre tipo " .
+				"FROM sia_programas p " .
+				"INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+				"LEFT JOIN sia_areas ar on a.idArea=ar.idArea " .
+				"inner join sia_tiposauditoria ta on a.tipoAuditoria=ta.idTipoAuditoria " .
+				"Where a.idCuenta=:cuenta  and a.idArea=:area 
+					and a.idEtapa in (
+						Select idEtapa from sia_rolesetapas re inner join sia_usuariosroles ur on ur.idRol = re.idRol  Where ur.idUsuario=:usrActual
+					) " .
+				"ORDER BY a.idAuditoria desc ";
+					
+				$dbQuery = $db->prepare($sql);
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':area' => $area, ':usrActual' => $usrActual));	
+			}
+			else{
 
-		$dbQuery = $db->prepare($sql);
+				$sql="SELECT a.idAuditoria auditoria, COALESCE(a.clave, convert(varchar, a.idAuditoria)) claveAuditoria, ar.nombre area, dbo.lstSujetosByAuditoria(a.idAuditoria) sujeto, dbo.lstObjetosByAuditoria(a.idAuditoria) objeto, ta.nombre tipo  
+				FROM sia_programas p 
+				INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma 
+				INNER JOIN sia_areas ar on a.idArea=ar.idArea 
+		        INNER JOIN  sia_auditoriasauditores aa ON a.idCuenta=aa.idCuenta and a.idAuditoria=aa.idAuditoria
+				LEFT JOIN sia_tiposauditoria ta on a.tipoAuditoria= ta.idTipoAuditoria
+				WHERE a.idCuenta=:cuenta and aa.idAuditor=:auditor and  a.idEtapa in (Select idEtapa from sia_rolesetapas re inner join sia_usuariosroles ur on ur.idRol = re.idRol  Where ur.idUsuario=:usrActual) 
+				ORDER BY a.idAuditoria desc";
 
-		$dbQuery->execute(array(':cuenta' => $cuenta));
-
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS.");
-		}else{
-			$app->render('acopio.php', $result);
+				$dbQuery = $db->prepare($sql);
+				$dbQuery->execute(array(':cuenta' => $cuenta,  ':auditor' => $rpe,  ':usrActual' => $usrActual));				
+			}	
 		}
-
-
-	});
-
-	/*
-	$app->get('/catAuditores', function()  use ($app) {
-		$app->render('catAuditores.php');
-	});
-*/
-
-
-
-
-
-
-
-
-
-
-
-	$app->get('/papeles', function()  use ($app, $db) {
-		$cuenta = $_SESSION["idCuentaActual"];
-
-		//$sql="SELECT distinct idCuenta, idPrograma FROM sia_programas WHERE idCuenta=:cuenta ";
-
-		$sql="SELECT p.idCuenta, p.idPrograma, p.idAuditoria auditoria,  s.nombre sujeto, o.nombre objeto, p.idPapel, p.tipoPapel, p.tipoResultado, p.resultado, ta.nombre tipo, " .
-		"CONVERT(VARCHAR(12),p.fAlta,102) fechaPapel, p.idFase fase, p.tipoPapel, p.tipoResultado, p.resultado, p.estatus  " .
-		"FROM sia_papeles p   " .
-		"LEFT JOIN sia_sujetos s on p.idSujeto=s.idSujeto " .
-		"LEFT JOIN sia_objetos o on p.idSujeto=o.idSujeto and p.idObjeto=o.idObjeto  " .
-		"LEFT JOIN sia_auditorias a on p.idAuditoria=a.idAuditoria " .
-		"LEFT JOIN sia_tiposauditoria ta on a.tipoAuditoria=ta.idTipoAuditoria  " .
-		"ORDER BY  p.idPapel DESC";
-
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':cuenta' => $cuenta));
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS.");
-		}else{
-			$app->render('papeles.php', $result);
-		}
-	})->name('listaPapeles');
+		$app->render('dashboard.php', $result);
+	})->name('listaDashboard');
 
 
 
+	
 
 
-	$app->get('/avances', function()  use ($app) {
-
-		$app->render('avances.php');
-	});
-
-	$app->get('/avanceActividad', function()  use ($app, $db) {
-		$cuenta = $_SESSION["idCuentaActual"];
-
-		//$sql="SELECT distinct idCuenta, idPrograma FROM sia_programas WHERE idCuenta=:cuenta ";
-
-		$sql="SELECT aa.idCuenta, aa.idPrograma, aa.idAuditoria auditoria,  s.nombre sujeto, o.nombre objeto, aas.descripcion actividad, ta.nombre tipo, aa.idAvance avance, " .
-		"CONVERT(VARCHAR(12),aa.fAlta,102) fechaAvance, aa.idFase fase, aa.porcentaje, aa.estatus " .
-		"FROM sia_auditoriasavances aa " .
-		"LEFT JOIN sia_sujetos s on s.idSujeto=aa.idSujeto " .
-		"LEFT JOIN sia_objetos o on o.idSujeto=aa.idSujeto and o.idObjeto=aa.idObjeto " .
-		"LEFT JOIN sia_auditoriasactividades aas on aa.idActividad=aas.idActividad " .
-		"LEFT JOIN sia_auditorias a on aa.idAuditoria=a.idAuditoria " .
-		"LEFT JOIN sia_tiposauditoria ta on a.tipoAuditoria=ta.idTipoAuditoria " .
-		"ORDER BY  aa.idAvance DESC";
-
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':cuenta' => $cuenta));
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS.");
-		}else{
-			$app->render('avanceActividad.php', $result);
-		}
-	})->name('listaAvances');
-
-
-	$app->get('/auditorias', function()  use($app, $db) {
-		$sql="SELECT a.idAuditoria auditoria, ar.nombre area, s.nombre sujeto, o.nombre objeto, a.tipoAuditoria tipo, '0.00' avances " .
-		"FROM sia_programas p " .
-		"INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
-		"LEFT JOIN sia_areas ar on a.idArea=ar.idArea " .
-		"LEFT JOIN sia_sujetos s on a.idSujeto=s.idSujeto " .
-		"LEFT JOIN sia_objetos o on a.idSujeto=o.idSujeto and a.idObjeto=o.idObjeto " .
-		"ORDER BY ar.nombre, s.nombre, o.nombre, a.tipoAuditoria ";
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute();
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS.");
-		}else{
-			$app->render('auditorias.php', $result);
-		}
-	})->name('listaAuditorias');
-
-	$app->get('/catUsuarios', function()  use ($app) {
-		$app->render('catUsuarios.php');
-	});
 
 	$app->get('/catProcesos', function()  use ($app) {
 		$app->render('catProcesos.php');
@@ -303,6 +257,19 @@
 		$app->render('catObjetos.php');
 	});
 
+	$app->get('/catTiposAuditorias', function()  use ($app, $db) {
+		$sql="SELECT idTipoAuditoria id, nombre, estatus FROM sia_tiposauditoria ORDER BY nombre";
+		$dbQuery = $db->prepare($sql);
+		$dbQuery->execute();
+		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
+		if(!$result){
+			$app->halt(404, "NO SE ENCONTRARON DATOS.");
+		}else{
+			$app->render('catTiposAuditorias.php', $result);
+		}
+	})->name('listaTiposAuditorias');
+
+
 	$app->get('/catCuentas', function()  use ($app, $db) {
 		$sql="SELECT idCuenta id, nombre, fInicio inicio, fFin fin, estatus FROM sia_cuentas ORDER BY anio";
 		$dbQuery = $db->prepare($sql);
@@ -316,7 +283,7 @@
 	})->name('listaCuentas');
 
 	$app->get('/lstCuentasByID/:id', function($id)    use($app, $db) {
-		$sql="SELECT idCuenta id, anio, nombre, fInicio inicio, fFin fin,  observaciones, estatus FROM sia_cuentas  Where idCuenta=:id ORDER BY anio";
+		$sql="SELECT idCuenta id, anio, nombre, fInicio inicio, fFin fin,  observaciones, archivoOriginal, archivoFinal, estatus FROM sia_cuentas  Where idCuenta=:id ORDER BY anio";
 		$dbQuery = $db->prepare($sql);
 		$dbQuery->execute(array(':id' => $id));
 		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
@@ -328,82 +295,36 @@
 	});
 
 
-
-	$app->get('/lstPapeles', function()    use($app, $db) {
-		$sql="SELECT tp.idTipoPapel id, tp.nombre texto FROM sia_papelesfases pf INNER JOIN sia_tipospapeles tp on pf.idTipoPapel= tp.idTipoPapel ORDER BY tp.nombre";
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array());
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS ");
-		}else{
-			echo json_encode($result);
-		}
-	});
-
-	$app->get('/lstPapelesByFase/:id', function($id)    use($app, $db) {
-		$sql="SELECT tp.idTipoPapel id, tp.nombre texto FROM sia_papelesfases pf INNER JOIN sia_tipospapeles tp on pf.idTipoPapel= tp.idTipoPapel WHERE pf.idFase=:id ORDER BY tp.nombre";
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':id' => $id));
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS ");
-		}else{
-			echo json_encode($result);
-		}
-
-	});
-	
-
-
-
-
-
-
-	//Guarda un papel
-	$app->post('/guardar/papel', function()  use($app, $db) {
-		$usrActual = $_SESSION["idUsuario"];
-
-		$request=$app->request;
-		$id = $request->post('txtPapel');
-		$oper = $request->post('txtOperacion');
-		$cuenta = $request->post('txtCuenta');
-		$programa = $request->post('txtPrograma');
-		$auditoria = $request->post('txtAuditoria');
-		$sujeto = $request->post('txtSujeto');
-		$objeto = $request->post('txtObjeto');
-		$fase = $request->post('txtFase');
-		$tipoPapel = $request->post('txtTipoPapel');
-		$tipoResultado = $request->post('txtTipoRes');
-		$resultado = strtoupper($request->post('txtResultado'));
-
-		if($oper=='INS'){
-			$sql="INSERT INTO sia_papeles (idCuenta, idPrograma, idAuditoria, idSujeto, idObjeto, idFase, tipoPapel, tipoResultado, resultado,  usrAlta, fAlta, estatus) " .
-			"VALUES(:cuenta, :programa, :auditoria, :sujeto, :objeto, :fase, :tipoPapel, :tipoResultado, :resultado, :usrActual, getdate(), 'ACTIVO');";
-
-			$dbQuery = $db->prepare($sql);
-			$dbQuery->execute(array(':cuenta' => $cuenta, ':programa' => $programa, ':auditoria' => $auditoria, ':sujeto' => $sujeto, ':objeto' => $objeto, ':fase' => $fase, ':tipoPapel' => $tipoPapel,':tipoResultado' => $tipoResultado,':resultado' => $resultado, ':usrActual' => $usrActual ));
-		}else{
-			$sql="UPDATE sia_papeles SET " .
-			"idCuenta=:cuenta, idPrograma=:programa, idAuditoria=:auditoria, idSujeto=:sujeto, idObjeto=:objeto, idFase=:fase, tipoPapel=:tipoPapel, tipoResultado=:tipoResultado, resultado=:resultado, " .
-			"usrModificacion=:usrActual, fModificacion=now() " .
-			"WHERE idPapel=:id";
-
-			$dbQuery = $db->prepare($sql);
-			$dbQuery->execute(array(':cuenta' => $cuenta, ':programa' => $programa, ':auditoria' => $auditoria, ':sujeto' => $sujeto, ':objeto' => $objeto, ':fase' => $fase, ':tipoPapel' => $tipoPapel,':tipoResultado' => $tipoResultado,':resultado' => $resultado, ':id' => $id  ));
-		}
-		$app->redirect($app->urlFor('listaPapeles'));
-	});
-
-
-
-	
 
 	$app->get('/lstAuditoriaByID/:id', function($id)    use($app, $db) {
-		$sql="SELECT idCuenta cuenta, idPrograma programa, idAuditoria auditoria,  tipoAuditoria tipo, idArea area, idSujeto sujeto, idObjeto objeto, objetivo, alcance, justificacion " .
-		"FROM sia_auditorias  WHERE idAuditoria=:id ";
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':id' => $id));
+		$cuenta = $_SESSION["idCuentaActual"];
+		$area = $_SESSION["idArea"];
+		
+		$usrActual = $_SESSION["idUsuario"];
+		$global = $_SESSION["usrGlobal"];
+		/*
+		$sql="SELECT idCuenta cuenta, idPrograma programa, idAuditoria auditoria,  tipoAuditoria tipo, idArea area, idSector sector, idSubsector subSector, idUnidad unidad, idObjeto objeto, objetivo, alcance, justificacion, tipoPresupuesto, acompanamiento, idProceso proceso, idEtapa etapa  FROM sia_auditorias  WHERE idAuditoria=:id ";
+		*/
+		if ($global=="SI"){
+
+			$sql="SELECT a.idCuenta cuenta,a.idPrograma programa, a.idAuditoria auditoria,COALESCE(convert(varchar(20),a.clave),convert(varchar(20),a.idAuditoria)) claveAuditoria, isnull(a.clave,'') clave, a.tipoAuditoria tipo, a.idArea area,a.objetivo, a.alcance, a.justificacion, a.tipoPresupuesto, a.acompanamiento, a.idProceso proceso, a.idEtapa etapa, REPLACE(ISNULL(CONVERT(VARCHAR(10),a.fInicio,105), ''), '1900-01-01', '') feInicio, REPLACE(ISNULL(CONVERT(VARCHAR(10),a.fFin,105), ''), '1900-01-01', '') feFin, a.tipoObservacion tipoObse, a.observacion,a.idResponsable responsable, isnull(a.idSubresponsable,'') subresponsable,REPLACE(ISNULL(CONVERT(VARCHAR(10),a.fIRA,105), ''), '1900-01-01', '') ira, REPLACE(ISNULL(CONVERT(VARCHAR(10),a.fIFA,105), ''), '1900-01-01', '') ifa
+				FROM sia_auditorias a 
+				LEFT JOIN  sia_objetos o ON a.idObjeto = o.idObjeto 
+				WHERE  a.idCuenta=:cuenta AND a.idAuditoria =:id AND a.idEtapa in (SELECT idEtapa FROM sia_rolesetapas re INNER JOIN sia_usuariosroles ur ON ur.idRol = re.idRol  WHERE ur.idUsuario=:usrActual) ORDER BY a.idAuditoria ";
+				
+				$dbQuery = $db->prepare($sql);
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':id' => $id, ':usrActual' => $usrActual));
+		}else{
+
+			$sql="SELECT a.idCuenta cuenta,a.idPrograma programa, a.idAuditoria auditoria,COALESCE(convert(varchar(20),a.clave),convert(varchar(20),a.idAuditoria)) claveAuditoria, isnull(a.clave,'') clave, a.tipoAuditoria tipo, a.idArea area,a.objetivo, a.alcance, a.justificacion, a.tipoPresupuesto, a.acompanamiento, a.idProceso proceso, a.idEtapa etapa, REPLACE(ISNULL(CONVERT(VARCHAR(10),a.fInicio,105), ''), '1900-01-01', '') feInicio, REPLACE(ISNULL(CONVERT(VARCHAR(10),a.fFin,105), ''), '1900-01-01', '') feFin, a.tipoObservacion tipoObse, a.observacion,a.idResponsable responsable, isnull(a.idSubresponsable,'') subresponsable,REPLACE(ISNULL(CONVERT(VARCHAR(10),a.fIRA,105), ''), '1900-01-01', '') ira, REPLACE(ISNULL(CONVERT(VARCHAR(10),a.fIFA,105), ''), '1900-01-01', '') ifa
+				FROM sia_auditorias a 
+				LEFT JOIN  sia_objetos o ON a.idObjeto = o.idObjeto 
+				WHERE  a.idCuenta=:cuenta AND a.idArea =:area AND a.idAuditoria =:id AND a.idEtapa in (SELECT idEtapa FROM sia_rolesetapas re INNER JOIN sia_usuariosroles ur ON ur.idRol = re.idRol  WHERE ur.idUsuario=:usrActual) ORDER BY a.idAuditoria";
+				
+				$dbQuery = $db->prepare($sql);
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':id' => $id, ':area' => $area, ':usrActual' => $usrActual));		
+		}
+
 		$result = $dbQuery->fetch(PDO::FETCH_ASSOC);
 		if(!$result){
 			$app->halt(404, "NO SE ENCONTRARON DATOS ");
@@ -411,10 +332,6 @@
 			echo json_encode($result);
 		}
 	});
-
-	
-	
-	
 
 	$app->get('/lstCriteriosByAuditoria/:id', function($id)    use($app, $db) {
 	
@@ -471,17 +388,6 @@
 	});
 
 
-	$app->get('/tblActividadesByAuditoria/:id', function($id)    use($app, $db) {
-		$sql="SELECT idFase fase, descripcion actividad, fInicio inicio, fFin fin, porcentaje, idPrioridad prioridad  FROM sia_auditoriasactividades  WHERE idAuditoria=:id ";
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':id' => $id));
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS ");
-		}else{
-			echo json_encode($result);
-		}
-	});
 
 
 	//Guarda un avanceActividad
@@ -557,7 +463,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 			$dbQuery->execute(array(':cuenta' => $cuenta, ':programa' => $programa,':area' => $area, ':auditoria' => $auditoria, ':tipo' => $tipo,
 			':sujeto' => $sujeto, ':objeto' => $objeto,	 ':objetivo' => $objetivo, ':alcance' => $alcance, ':justificacion' => $justificacion, ':usrActual' => $usrActual ));
 
-			//echo "<hr>INSERTA AUDITORIA: " . $auditoria;
+			echo "<hr>INSERTA AUDITORIA: " . $auditoria;
 
 		}else{
 			$sql="UPDATE sia_auditorias " .
@@ -566,64 +472,14 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 			$dbQuery = $db->prepare($sql);
 			$dbQuery->execute(array(':tipo' => $tipo, ':area' => $area, ':sujeto' => $sujeto, ':objeto' => $objeto,	':objetivo' => $objetivo, ':alcance' => $alcance, ':justificacion' => $justificacion, ':usrActual' => $usrActual, ':auditoria' => $auditoria ));
 		}
+		
+		
 		$app->redirect($app->urlFor('listaPrograma'));
 	});
 
 
 // DATO
-	$app->get('/guardar/auditoria/actividad/:oper/:cadena',  function($oper, $cadena)  use($app, $db) {
-		$datos= $cadena;
-		$usrActual = $_SESSION["idUsuario"];
-		try{
-			if($datos<>""){
-				$dato = explode("|", $datos);
-				$cuenta=$dato[0];
-				$programa=$dato[1];
-				$auditoria=$dato[2];
-				$actividad=$dato[3];
-				$tipo=$dato[4];
-				$fase=$dato[5];
-				$descripcion=strtoupper($dato[6]);
-				$previa=$dato[7];
-
-				$inicio = date_create($dato[8]);
-				$inicio = $inicio->format('Y-m-d');
-
-				$fin = date_create($dato[9]);
-				$fin = $fin->format('Y-m-d');
-
-				$porcentaje=$dato[10];
-				$prioridad=$dato[11];
-				$impacto=$dato[12];
-				$responsable=$dato[13];
-				$estatus=$dato[14];
-				$notas=strtoupper($dato[15]);
-
-				if ($oper=='INS-ACT'){
-					$sql="INSERT INTO sia_auditoriasactividades (" .
-					"idCuenta, idPrograma, idAuditoria, idFase,idTipo, descripcion, idActividadPrevia, fInicio, fFin, porcentaje, idPrioridad, idImpacto, notas, idResponsable, usrAlta, fAlta, estatus) " .
-					"values(:cuenta, :programa, :auditoria, :fase, :tipo, :descripcion, :previa,  :inicio, :fin, :porcentaje, :prioridad, :impacto,:notas,:responsable,:usrAlta,getdate(),'ACTIVO')";
-					$dbQuery = $db->prepare($sql);
-					$dbQuery->execute(array(':cuenta' => $cuenta,':programa' => $programa,':auditoria' => $auditoria,':fase' => $fase,':tipo' => $tipo,':descripcion' => $descripcion,
-					':previa' => $previa, ':inicio' => $inicio,':fin' => $fin,':porcentaje' => $porcentaje,':prioridad' => $prioridad,':impacto' => $impacto,
-					':notas' => $notas,':responsable' => $responsable,':usrAlta' => $usrActual));
-					echo "OK";
-				}
-				else {
-
-				}
-			}
-			else{
-				echo "NO";
-			}
-		}catch (Exception $e) {
-				print "<br>¡Error en el TRY!: " . $e->getMessage();
-				die();
-			}
-
-
-
-	});
+	
 
 
 
@@ -673,14 +529,162 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 	});
 
 
+$app->get('/auditorias', function()  use ($app, $db) {
+		$cuenta = $_SESSION["idCuentaActual"];
+		$area = $_SESSION["idArea"];
+		$rpe = $_SESSION["idEmpleado"];
+		$usrActual = $_SESSION["idUsuario"];
+		$global = $_SESSION["usrGlobal"];
+		$globalArea = $_SESSION["usrGlobalArea"];
+		
+		if ($global=="SI"){
+			$sql="SELECT a.idAuditoria auditoria, COALESCE(convert(varchar(20),a.clave),convert(varchar(20),a.idAuditoria)) claveAuditoria, isnull(a.clave,'') clave, ar.nombre area,dbo.lstSujetosByAuditoria(a.idAuditoria) sujeto, dbo.lstObjetosByAuditoria(a.idAuditoria) objeto,ta.nombre tipo, a.idProceso proceso, a.idEtapa etapa " .
+				"FROM sia_programas p " .
+				"INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+				"INNER JOIN sia_areas ar on a.idArea=ar.idArea " .
+				//"INNER JOIN sia_unidades u on a.idCuenta = u.idCuenta and a.idSector=u.idSector and a.idSubsector = u.idSubsector and a.idUnidad=u.idUnidad " .
+				"LEFT JOIN sia_tiposauditoria ta on a.tipoAuditoria= ta.idTipoAuditoria " .
+				"WHERE a.idCuenta=:cuenta and a.idEtapa in (Select idEtapa from sia_rolesetapas re inner join sia_usuariosroles ur on ur.idRol = re.idRol  Where ur.idUsuario=:usrActual) " .
+				"ORDER BY a.idAuditoria";
+
+			$dbQuery = $db->prepare($sql);
+			$dbQuery->execute(array(':cuenta' => $cuenta, ':usrActual' => $usrActual));						
+		}else{
+			if ($globalArea=="SI"){
+				$sql="SELECT a.idAuditoria auditoria, COALESCE(convert(varchar(20),a.clave),convert(varchar(20),a.idAuditoria)) claveAuditoria, isnull(a.clave,'') clave, ar.nombre area, dbo.lstSujetosByAuditoria(a.idAuditoria) sujeto, dbo.lstObjetosByAuditoria(a.idAuditoria) objeto,ta.nombre tipo, a.idProceso proceso, a.idEtapa etapa " .
+					"FROM sia_programas p " .
+					"INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+					"INNER JOIN sia_areas ar on a.idArea=ar.idArea " .
+					//"INNER JOIN sia_unidades u on a.idCuenta = u.idCuenta and a.idSector=u.idSector and a.idSubsector = u.idSubsector and a.idUnidad=u.idUnidad " .
+					"LEFT JOIN sia_tiposauditoria ta on a.tipoAuditoria= ta.idTipoAuditoria " .
+					"WHERE a.idCuenta=:cuenta and a.idArea =:area and a.idEtapa in (Select idEtapa from sia_rolesetapas re inner join sia_usuariosroles ur on ur.idRol = re.idRol  Where ur.idUsuario=:usrActual) ORDER BY a.idAuditoria;";
+				$dbQuery = $db->prepare($sql);
+				$dbQuery->execute(array(':cuenta' => $cuenta, ':area' => $area, ':usrActual' => $usrActual));	
+
+				//echo "GLOBAL-AREA <hr> $sql <br> <br>Cuenta: $cuenta  Area= $area   usrActual= $usrActual";
+				
+			}else{
+				$sql="SELECT a.idAuditoria auditoria, COALESCE(convert(varchar(20),a.clave),convert(varchar(20),a.idAuditoria)) claveAuditoria, isnull(a.clave,'') clave, ar.nombre area, dbo.lstSujetosByAuditoria(a.idAuditoria) sujeto, dbo.lstObjetosByAuditoria(a.idAuditoria) objeto,ta.nombre tipo, a.idProceso proceso, a.idEtapa etapa " .
+				"FROM sia_programas p " .
+				"INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+				"INNER JOIN sia_areas ar on a.idArea=ar.idArea " .
+		        "INNER JOIN  sia_auditoriasauditores aa ON a.idCuenta=aa.idCuenta and a.idAuditoria=aa.idAuditoria " .
+				//"INNER JOIN sia_unidades u on a.idCuenta = u.idCuenta and a.idSector=u.idSector and a.idSubsector = u.idSubsector and a.idUnidad=u.idUnidad " .
+				"LEFT JOIN sia_tiposauditoria ta on a.tipoAuditoria= ta.idTipoAuditoria " .
+				"WHERE a.idCuenta=:cuenta and aa.idAuditor=:auditor and  a.idEtapa in (Select idEtapa from sia_rolesetapas re inner join sia_usuariosroles ur on ur.idRol = re.idRol  Where ur.idUsuario=:usrActual) ORDER BY a.idAuditoria;";
+			$dbQuery = $db->prepare($sql);
+			$dbQuery->execute(array(':cuenta' => $cuenta, ':auditor' => $rpe, ':usrActual' => $usrActual));
+			
+			}
+		}
+		
+		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
+		$app->render('auditorias.php', $result);
+	})->name('listaAuditorias');
+ 
+ 	//---- PROGRAMAS
+
 	$app->get('/programas', function()  use($app, $db) {
-		$sql="SELECT a.idAuditoria auditoria, ar.nombre area, s.nombre sujeto, o.nombre objeto, a.tipoAuditoria tipo " .
-		"FROM sia_programas p " .
-		"INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
-		"LEFT JOIN sia_areas ar on a.idArea=ar.idArea " .
-		"LEFT JOIN sia_sujetos s on a.idSujeto=s.idSujeto " .
-		"LEFT JOIN sia_objetos o on a.idSujeto=o.idSujeto and a.idObjeto=o.idObjeto " .
-		"ORDER BY ar.nombre, s.nombre, o.nombre, a.tipoAuditoria  ";
+		$cuenta     = $_SESSION["idCuentaActual"];
+		$area       = $_SESSION["idArea"];
+		$empleado   = $_SESSION["idEmpleado"];
+		$usrActual  = $_SESSION["idUsuario"];
+		$global     = $_SESSION["usrGlobal"];
+		$globalArea = $_SESSION["usrGlobalArea"];		
+
+		$aDatos     = array(':cuenta' => $cuenta, ':usrActual' => $usrActual);
+
+		if ($global=="SI"){
+
+			$sql="SELECT a.idAuditoria auditoria, e.nombre etapa, COALESCE(convert(varchar(20),a.clave),convert(varchar(20),a.idAuditoria)) claveAuditoria, isnull(a.clave,'') clave, ar.nombre area, dbo.lstSujetosByAuditoria(a.idAuditoria) sujeto, dbo.lstObjetosByAuditoria(a.idAuditoria) objeto, ta.nombre tipo, '0.00' avances " .
+			" FROM sia_programas p " .
+  			" INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+			" INNER JOIN sia_areas ar on a.idArea=ar.idArea " .
+			" LEFT  JOIN sia_tiposauditoria ta on a.tipoAuditoria= ta.idTipoAuditoria " .
+			" LEFT  JOIN sia_etapas e on e.idProceso =a.idProceso and e.idEtapa=a.idEtapa " .
+			" WHERE a.idCuenta=:cuenta AND a.idEtapa in (Select idEtapa from sia_rolesetapas re inner join sia_usuariosroles ur on ur.idRol = re.idRol Where ur.idUsuario=:usrActual) ".		
+			" ORDER BY a.idAuditoria desc";
+				
+		}else{
+
+			if ($globalArea=="SI"){
+
+				$sql="SELECT a.idAuditoria auditoria, e.nombre etapa, COALESCE(convert(varchar(20),a.clave),convert(varchar(20),a.idAuditoria)) claveAuditoria, isnull(a.clave,'') clave, ar.nombre area, dbo.lstSujetosByAuditoria(a.idAuditoria) sujeto, dbo.lstObjetosByAuditoria(a.idAuditoria) objeto, ta.nombre tipo, '0.00' avances " .
+				" FROM sia_programas p " .
+	  			" INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+				" INNER JOIN sia_areas ar on a.idArea=ar.idArea " .
+				" LEFT  JOIN sia_tiposauditoria ta on a.tipoAuditoria= ta.idTipoAuditoria " .
+				" LEFT  JOIN sia_etapas e on e.idProceso =a.idProceso and e.idEtapa=a.idEtapa" .
+				" WHERE a.idCuenta=:cuenta AND a.idEtapa in (Select idEtapa from sia_rolesetapas re inner join sia_usuariosroles ur on ur.idRol = re.idRol Where ur.idUsuario=:usrActual) " ;
+
+				if ( $area == 'UTSFFA' || $area == 'UTSFEAJ' ) {
+					$sql = $sql . " AND a.idArea in (SELECT idArea from sia_areas where antecesor = :area) ";
+					$aDatos[':area'] = $area;
+				}elseif ( $area == 'CAAAF') {
+				} else {
+					$sql = $sql . " AND a.idArea=:area ";  
+					$aDatos[':area'] = $area;
+				}
+				$sql = $sql . " ORDER BY a.idAuditoria desc";
+					
+
+			}else{
+
+				$sql="SELECT a.idAuditoria auditoria, e.nombre etapa, COALESCE(convert(varchar(20),a.clave),convert(varchar(20),a.idAuditoria)) claveAuditoria, isnull(a.clave,'') clave, ar.nombre area, dbo.lstSujetosByAuditoria(a.idAuditoria) sujeto, dbo.lstObjetosByAuditoria(a.idAuditoria) objeto, ta.nombre tipo, '0.00' avances " .
+				"FROM sia_programas p " .
+	  			" INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+				" INNER JOIN sia_areas ar on a.idArea=ar.idArea " .
+		        //" INNER JOIN sia_auditoriasauditores aa ON a.idCuenta=aa.idCuenta and a.idAuditoria=aa.idAuditoria " . // Se bloquea por que en PGA, aún no se tiene la relación de auditorias-auditores
+				" LEFT  JOIN sia_etapas e on e.idProceso =a.idProceso and e.idEtapa=a.idEtapa" .
+				" LEFT  JOIN sia_tiposauditoria ta on a.tipoAuditoria= ta.idTipoAuditoria " .
+				" WHERE a.idCuenta=:cuenta AND a.idEtapa in (Select idEtapa from sia_rolesetapas re inner join sia_usuariosroles ur on ur.idRol = re.idRol  Where ur.idUsuario=:usrActual) " .
+				//" AND aa.idAuditor=:auditor " . //Línea anterior.
+				" AND a.usrAlta=:usrActual2 " .  // Línea nueva. 
+				" ORDER BY a.idAuditoria desc";
+					
+				//$aDatos[':auditor'] = $empleado;  // Línea anterior.
+				$aDatos[':usrActual2'] = $usrActual;  // Línea nueva.
+
+			}
+		}
+
+		$dbQuery = $db->prepare($sql);
+		$dbQuery->execute($aDatos);		
+
+		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
+		if(!$result){
+			$app->halt(404, "NO SE ENCONTRARON DATOS.");
+		}else{
+			$app->render('programas.php', $result);
+		}
+	})->name('listaPrograma');
+
+
+/*
+
+		$sql="SELECT a.idAuditoria auditoria, ar.nombre area, u.nombre sujeto, o.nombre objeto, a.tipoAuditoria tipo, '0.00' avances " .
+			"FROM sia_programas p " .
+  			"INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+			"LEFT JOIN sia_areas ar on a.idArea=ar.idArea " .
+			"LEFT JOIN sia_unidades u on a.idCuenta = u.idCuenta and a.idSector=u.idSector and a.idUnidad=u.idUnidad " .
+			"LEFT JOIN sia_objetos o on a.idObjeto=o.idObjeto and a.idCuenta=o.idCuenta and a.idPrograma=o.idPrograma and a.idAuditoria = o.idAuditoria " .
+			"ORDER BY ar.nombre, u.nombre, o.nombre, a.tipoAuditoria  ";
+			
+
+		$dbQuery = $db->prepare($sql);
+		$dbQuery->execute();
+		*/
+
+/*
+	$app->get('/programas', function()  use($app, $db) {
+		$sql="SELECT a.idAuditoria auditoria, ar.nombre area, u.nombre sujeto, o.nombre objeto, a.tipoAuditoria tipo, '0.00' avances " .
+			"FROM sia_programas p " .
+  			"INNER JOIN sia_auditorias a on p.idCuenta=a.idCuenta and p.idPrograma=a.idPrograma " .
+			"LEFT JOIN sia_areas ar on a.idArea=ar.idArea " .
+			"LEFT JOIN sia_unidades u on a.idCuenta = u.idCuenta and a.idSector=u.idSector and a.idUnidad=u.idUnidad " .
+			"LEFT JOIN sia_objetos o on a.idObjeto=o.idObjeto and a.idCuenta=o.idCuenta and a.idPrograma=o.idPrograma and a.idAuditoria = o.idAuditoria " .
+			"ORDER BY ar.nombre, u.nombre, o.nombre, a.tipoAuditoria  ";
+
 		$dbQuery = $db->prepare($sql);
 		$dbQuery->execute();
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
@@ -691,6 +695,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		}
 	})->name('listaPrograma');
 
+*/
 		$app->get('/tblGastoByUnidad/:sector/:subsector/:unidad', function($sector, $subsector, $unidad)    use($app, $db) {
 		$cuenta = $_SESSION["idCuentaActual"];
 		try{
@@ -714,13 +719,6 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		}
 
 	});
-
-
-	
-
-
-
-
 
 	//Lista de Areas
 	$app->get('/lstAreas', function()    use($app, $db) {
@@ -789,7 +787,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 	//Lista de sujetos
 	$app->get('/lstSujetos', function()    use($app, $db) {
-		$sql="SELECT ltrim(idSujeto) id, concat(ltrim(idSujeto), ' ', nombre) texto FROM sia_sujetos order by nombre";
+		$sql="SELECT ltrim(idUnidad) id, concat(ltrim(idUnidad), ' ', nombre) texto FROM sia_unidades order by nombre";
 		$dbQuery = $db->prepare($sql);
 		$dbQuery->execute();
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
@@ -803,16 +801,18 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 	//Lista de tipos de auditorias
 	$app->get('/lstTiposAuditorias', function()    use($app, $db) {
 
+		$empleado = $_SESSION["idEmpleado"];
+		$area = $_SESSION["idArea"];
+
 		$sql="SELECT idTipoAuditoria id, nombre texto FROM sia_tiposAuditoria order by nombre";
+		
+		/*//$sql="SELECT idTipoAuditoria id, nombre texto FROM sia_tiposAuditoria ".
+				"WHERE  idTipoAuditoria in (SELECT idTipoAuditoria FROM sia_areastiposauditoria Where idArea=:area )";*/
 
 		$dbQuery = $db->prepare($sql);
 		$dbQuery->execute();
 		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON DATOS ");
-		}else{
-			echo json_encode($result);
-		}
+		echo json_encode($result);
 	});
 
 	//Listar objetos by sujeto
@@ -832,7 +832,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 	//Listar auditorias by sujeto
 	$app->get('/lstAuditoriasBySujeto/:id', function($id)  use($app, $db) {
-		$sql="SELECT idAuditoria id, concat(idAuditoria, ' ', tipoAuditoria) texto FROM sia_auditorias Where idSujeto=:id order by 2 asc";
+		$sql="SELECT idAuditoria id, concat(idAuditoria, ' ', tipoAuditoria) texto, idProceso proceso, idEtapa etapa  FROM sia_auditorias Where idSujeto=:id order by 2 asc";
 
 		$dbQuery = $db->prepare($sql);
 		$dbQuery->execute(array(':id' => $id));
@@ -844,28 +844,12 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		}
 	});
 
-	//Listar actividades by auditoria + fase
-	$app->get('/lstActividadesByAuditoriaFase/:audi/:fase', function($audi, $fase)  use($app, $db) {
-		$sql="SELECT idActividad id, concat(idFase, '.- ', descripcion) texto FROM sia_auditoriasactividades Where idAuditoria=:audi and idFase=:fase order by 2 asc";
-
-		$dbQuery = $db->prepare($sql);
-		$dbQuery->execute(array(':audi' => $audi, ':fase' => $fase));
-		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
-		if(!$result){
-			$app->halt(404, "NO SE ENCONTRARON ACTIVIDADES. ");
-		}else{
-			echo json_encode($result);
-		}
-	});
-
-
-
 	//Listar auditorias by sujeto + objeto
 	$app->get('/lstAuditoriasBySujetoObjeto/:suj/:obj', function($suj, $obj)  use($app, $db) {
 		$cuenta = $_SESSION["idCuentaActual"];
 
 
-		$sql="SELECT idAuditoria id, concat(idAuditoria, ' ', tipoAuditoria) texto FROM sia_auditorias Where idCuenta=:cuenta and ltrim(idSujeto)=:suj and ltrim(idObjeto)=:obj order by 2 asc";
+		$sql="SELECT idAuditoria id, concat(idAuditoria, ' ', tipoAuditoria) texto, idProceso proceso, idEtapa etapa FROM sia_auditorias Where idCuenta=:cuenta and ltrim(idSujeto)=:suj and ltrim(idObjeto)=:obj order by 2 asc";
 
 		$dbQuery = $db->prepare($sql);
 		$dbQuery->execute(array(':cuenta' => $cuenta, ':suj' => $suj, ':obj' => $obj));
@@ -880,9 +864,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 
 
-	$app->get('/notificaciones', function()  use ($app) {
-		$app->render('notificaciones.php');
-	});
+
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -951,10 +933,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 
 			$result= array('idUsuario' => $_SESSION["idUsuario"] , 'nombre' => $_SESSION["sUsuario"] );
-			$app->render('./dashboard.php', $result);
-
-
-
+			$app->redirect($app->urlFor('listaDashboard'));
 		}catch (PDOException $e) {
 			print "¡Error!: " . $e->getMessage() . "<br/>";
 			die();
@@ -967,7 +946,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 
 	$app->get('/reportes', function()  use ($app, $db) {
 		$usrActual = $_SESSION["idUsuario"];
-		$sql="SELECT r.idReporte, r.nombre sReporte, r.idModulo sModulo, r.archivo ".
+		$sql="SELECT r.idReporte, r.nombre sReporte, r.archivo ".
 		"FROM sia_usuarios u ".
 		"INNER JOIN sia_usuariosRoles ur on u.idUsuario=ur.idUsuario ".
 		"INNER JOIN sia_rolesReportes rr on ur.idRol=rr.idRol ".
@@ -1053,7 +1032,7 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 //Lista de Módulos by Usuario
 	$app->get('/lstModulosByUsuarioCampana/:id', function($id)    use($app, $db) {
 		$usrActual = $_SESSION["idUsuario"];
-		$sql="SELECT m.idModulo, m.nombre, m.icono, m.panel, m.liga " .
+		$sql="SELECT distinct m.idModulo, m.nombre, m.icono, m.panel, m.liga, m.orden, m.icono " .
 		"FROM sia_rolesModulos rm " .
 		"INNER JOIN sia_modulos m ON rm.idModulo=m.idModulo " .
 		"WHERE rm.idRol in (Select idRol from sia_usuariosRoles Where idUsuario=:usrActual) " .
@@ -1069,8 +1048,65 @@ $app->post('/guardar/avance', function()  use($app, $db) {
 		}
 	});
 
+	$app->get('/lstAniosCuentaPublica', function()    use($app, $db) {
+		$usrActual = $_SESSION["idUsuario"];
+
+		$sql="SELECT anio id, anio texto FROM sia_cuentas WHERE estatus = 'ACTIVO' ORDER BY anio desc;";
+
+		$dbQuery = $db->prepare($sql);
+		$dbQuery->execute();
+		$result['datos'] = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
+		if(!$result){
+			$app->halt(404, "NO SE ENCONTRARON DATOS ");
+		}else{
+			echo json_encode($result);
+		}
+	});
+
+	function obtenerGif($archivo)
+	{
+		$gif = "";
+		$pos = strpos($archivo, '.');
+		$ext = trim(strtoupper(substr($archivo, $pos+1)));
+		
+
+		if ($ext=='XLS' || $ext=='XLSX'){
+			$gif = '<img src="img/xls.gif" />';
+		}else{ 
+			if ($ext=='DOC' || $ext=='DOCX'){
+				$gif = '<img src="img/doc.gif" />';
+			}else{
+				if ($ext=='PDF'){
+					$gif = '<img src="img/pdf.gif"/>';
+				}else{
+					if ($ext=='ZIP'){
+						$gif = '<img src="img/zip.gif"/>';
+					}else{
+						$gif = '<img src="img/xls.gif"/>';
+					}
+				}
+			}
+		}
+		return $ext;
+	}
+
+
+	function obtenerGifEstatus($sColor)
+	{
+		$gif = "";
+		if ($sColor=='VERDE'){
+			$gif = '<img src="img/microesferaverde.gif" />';
+		}else{ 
+			if ($sColor=='ROJO'){
+				$gif = '<img src="img/microesferaroja.gif" />';
+			}else{
+				$gif = '<img src="img/microesferaamarilla.gif" />';
+			}
+		}
+	    return $gif;
+	}
 
 
 
-
+   
 	$app->run();
